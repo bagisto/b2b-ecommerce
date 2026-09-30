@@ -2,6 +2,7 @@
 @if (
     (bool) core()->getConfigData('b2b.general.settings.active')
     && auth()->guard('customer')->check()
+    && customer_bouncer()->hasPermission('account.requisitions')
 )
     @php
         $currentRoute = request()->route()?->getName();
