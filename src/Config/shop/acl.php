@@ -132,7 +132,6 @@ return [
         'key' => 'requisitions.create',
         'name' => 'b2b::app.shop.acl.create',
         'route' => [
-            'shop.customers.account.requisitions.create',
             'shop.customers.account.requisitions.store',
         ],
         'sort' => 1,

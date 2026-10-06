@@ -2,6 +2,14 @@
 
 This changelog consists of the bug & security updates.
 
+## **v2.2.1 (6th of October 2026)** - *Release*
+
+- #55 [fixed] - Opening a requisition list no longer risks a server error. The suite routed `GET customer/account/requisitions/create` to a controller action that does not exist; creating a list has always been done through the modal on the requisitions page, which posts to its own route, so the dead route has been removed along with the duplicate page heading that linked to it.
+
+- #54 [fixed] - The "Add To Requisition List" button no longer appears for customers outside a company. It is now gated on the same requisition permission the account menu and the customer bouncer already use.
+
+- #53 [fixed] - Creating a customer from the admin works again. The suite publishes its own copy of the customer create form, and that copy had fallen behind Bagisto's — it was missing the Channel selector, so the field could never be filled while Bagisto still required it and rejected every save.
+
 ## **v2.2.0 (21st of August 2026)** - *Release*
 
 - Compatibility with Bagisto v2.4.10. No suite change was required for it: every class, route, Blade component, view and translation key the suite consumes from Bagisto still resolves on v2.4.10, and the admin, storefront and company account areas were exercised against it. The suite continues to support v2.4.9.

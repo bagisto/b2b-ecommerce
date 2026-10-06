@@ -210,6 +210,32 @@
                                 <x-admin::form.control-group.error control-name="gender" />
                             </x-admin::form.control-group>
 
+                            <!-- Channel -->
+                            <x-admin::form.control-group class="w-full">
+                                <x-admin::form.control-group.label class="required">
+                                    @lang('admin::app.customers.customers.index.create.channel')
+                                </x-admin::form.control-group.label>
+
+                                <x-admin::form.control-group.control
+                                    type="select"
+                                    id="channel"
+                                    name="channel_id"
+                                    rules="required"
+                                    :label="trans('admin::app.customers.customers.index.create.channel')"
+                                    ::value="channels[0]?.id"
+                                >
+                                    <option 
+                                        v-for="channel in channels" 
+                                        :value="channel.id"
+                                        selected
+                                    > 
+                                        @{{ channel.name }} (@{{ channel.code }})
+                                    </option>
+                                </x-admin::form.control-group.control>
+
+                                <x-admin::form.control-group.error control-name="channel_id" />
+                            </x-admin::form.control-group>
+
                             <!-- Customer Group -->
                             <x-admin::form.control-group class="w-full">
                                 <x-admin::form.control-group.label>
@@ -262,6 +288,8 @@
             data() {
                 return {
                     groups: @json($groups),
+
+                    channels: @json($channels),
 
                     isLoading: false,
 

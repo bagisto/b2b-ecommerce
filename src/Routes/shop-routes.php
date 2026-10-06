@@ -80,8 +80,6 @@ Route::group(['middleware' => ['theme', 'locale', 'currency', 'customer', 'custo
 
         Route::get('get', 'list')->name('shop.customers.account.requisitions.list');
 
-        Route::get('create', 'create')->name('shop.customers.account.requisitions.create');
-
         Route::post('create', 'store')->name('shop.customers.account.requisitions.store');
 
         Route::get('edit/{id}', 'edit')->name('shop.customers.account.requisitions.edit');
