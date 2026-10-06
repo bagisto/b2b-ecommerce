@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => 'Ürün Ata',
             'attributes' => 'Öznitelikler',
             'b2b' => 'B2B Suite',
             'companies' => 'Şirketler',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => 'Teklif Ekleri',
                         'quote-deleted' => 'Teklif başarıyla silindi.',
                         'quote-description' => 'Açıklama',
+                        'quote-expired' => 'Bu teklifin süresi doldu.',
                         'quote-information' => 'Teklif Bilgileri',
                         'quote-item-updated' => 'Teklif öğeleri başarıyla güncellendi.',
                         'quote-items' => 'Teklif Öğeleri',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => 'İstek listenizde ürün yok. Eklemeye başlayın!',
                     'item-updated' => 'İstek listesi öğeleri başarıyla güncellendi.',
                     'items-selected' => ':count Öğe Seçildi',
+                    'limit-reached' => 'Maksimum istek listesi sayısına ulaştınız.',
                     'move-to-cart' => 'Seçilenleri Sepete Taşı',
                     'move-to-cart-success' => 'Ürün sepete başarıyla taşındı.',
                     'not-found' => 'İstek listesi bulunamadı.',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Rol başarıyla oluşturuldu.',
+                    'delete-failed' => 'Rol silinemedi.',
                     'delete-success' => 'Rol başarıyla silindi.',
                     'update-success' => 'Rol başarıyla güncellendi.',
 

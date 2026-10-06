@@ -304,7 +304,7 @@
             <template v-if="cart && cart.items && cart.items.length">
                 <!-- Request for Quote trigger -->
                 <button
-                    v-if="parseFloat(cart.grand_total) >= {{ $b2bMinimumAmount }}"
+                    v-if="parseFloat(cart.grand_total) >= {{ core()->convertPrice($b2bMinimumAmount) }}"
                     type="button"
                     class="secondary-button mt-3 place-self-end rounded-2xl px-11 py-3 max-md:max-w-full max-md:rounded-lg max-md:py-3 max-md:text-sm max-sm:w-full max-sm:py-2"
                     @click="$emitter.emit('open-request-quote-modal')"

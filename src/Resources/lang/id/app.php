@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => 'Tetapkan Produk',
             'attributes' => 'Atribut',
             'b2b' => 'B2B Suite',
             'companies' => 'Perusahaan',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => 'Lampiran Penawaran',
                         'quote-deleted' => 'Penawaran berhasil dihapus.',
                         'quote-description' => 'Deskripsi',
+                        'quote-expired' => 'Penawaran ini telah kedaluwarsa.',
                         'quote-information' => 'Informasi Penawaran',
                         'quote-item-updated' => 'Item penawaran berhasil diperbarui.',
                         'quote-items' => 'Item Penawaran',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => 'Anda tidak memiliki produk dalam daftar permintaan Anda. Mulai tambahkan beberapa!',
                     'item-updated' => 'Item daftar permintaan berhasil diperbarui.',
                     'items-selected' => ':count Item Dipilih',
+                    'limit-reached' => 'Anda telah mencapai jumlah maksimum daftar permintaan.',
                     'move-to-cart' => 'Pindahkan yang Dipilih Ke Keranjang',
                     'move-to-cart-success' => 'Produk berhasil dipindahkan ke keranjang.',
                     'not-found' => 'Daftar permintaan tidak ditemukan.',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Peran berhasil dibuat.',
+                    'delete-failed' => 'Peran tidak dapat dihapus.',
                     'delete-success' => 'Peran berhasil dihapus.',
                     'update-success' => 'Peran berhasil diperbarui.',
 

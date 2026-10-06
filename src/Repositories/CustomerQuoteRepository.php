@@ -180,7 +180,7 @@ class CustomerQuoteRepository extends Repository
                     (isset($additional['quote_id']) && $additional['quote_id'] == $quote->id)
                     && (isset($additional['quote_item_id']) && $additional['quote_item_id'] == $quoteItem->id)
                 ) {
-                    $cartItem->custom_price = core()->convertPrice($quoteItem->base_negotiated_price);
+                    $cartItem->custom_price = $quoteItem->base_negotiated_price;
                     $cartItem->save();
                 }
             }
@@ -228,8 +228,6 @@ class CustomerQuoteRepository extends Repository
     {
         $quote = $this->find($id);
 
-        $baseCurrencyCode = core()->getBaseCurrencyCode();
-
         /**
          * Line items the admin removed during negotiation are deleted (their quotation
          * snapshots cascade). Guarded by a non-empty remaining set so a quote can never be
@@ -255,7 +253,10 @@ class CustomerQuoteRepository extends Repository
         $subtotal = 0;
 
         foreach ($data['items'] ?? [] as $itemId => $itemData) {
-            if (! $item = $this->customerQuoteItemRepository->find($itemId)) {
+            if (! $item = $this->customerQuoteItemRepository->findOneWhere([
+                'id' => $itemId,
+                'customer_quote_id' => $quote->id,
+            ])) {
                 continue;
             }
 
@@ -301,20 +302,27 @@ class CustomerQuoteRepository extends Repository
 
         $itemNegotiatedTotal = 0;
 
+        $itemBaseNegotiatedTotal = 0;
+
         foreach ($lines as $line) {
             $item = $line['item'];
 
             $negotiatedPrice = round($line['price'] * $factor, 4);
             $negotiatedTotal = $negotiatedPrice * $line['qty'];
 
+            $baseNegotiatedPrice = $this->toBaseAmount($negotiatedPrice, $item);
+            $baseNegotiatedTotal = $baseNegotiatedPrice * $line['qty'];
+
             $itemNegotiatedTotal += $negotiatedTotal;
+
+            $itemBaseNegotiatedTotal += $baseNegotiatedTotal;
 
             $this->customerQuoteItemRepository->update([
                 'negotiated_qty' => $line['qty'],
                 'negotiated_price' => $negotiatedPrice,
-                'base_negotiated_price' => core()->convertToBasePrice($negotiatedPrice, $baseCurrencyCode),
+                'base_negotiated_price' => $baseNegotiatedPrice,
                 'negotiated_total' => $negotiatedTotal,
-                'base_negotiated_total' => core()->convertToBasePrice($negotiatedTotal, $baseCurrencyCode),
+                'base_negotiated_total' => $baseNegotiatedTotal,
                 'discount_type' => $line['discount_type'],
                 'discount_value' => $line['discount_value'],
                 'note' => $data['message'] ?? trans('b2b::app.shop.customers.account.quotes.view.item-updated', [
@@ -334,21 +342,33 @@ class CustomerQuoteRepository extends Repository
                 'discount_type' => $line['discount_type'],
                 'discount_value' => $line['discount_value'],
                 'price' => $negotiatedPrice,
-                'base_price' => core()->convertToBasePrice($negotiatedPrice, $baseCurrencyCode),
+                'base_price' => $baseNegotiatedPrice,
                 'total' => $negotiatedTotal,
-                'base_total' => core()->convertToBasePrice($negotiatedTotal, $baseCurrencyCode),
+                'base_total' => $baseNegotiatedTotal,
             ]);
         }
 
         $quote->update([
             'status' => $data['status'] ?? $quote->status,
             'negotiated_total' => $itemNegotiatedTotal,
-            'base_negotiated_total' => core()->convertToBasePrice($itemNegotiatedTotal, $baseCurrencyCode),
+            'base_negotiated_total' => $itemBaseNegotiatedTotal,
             'discount_type' => $totalValue > 0 ? $totalType : null,
             'discount_value' => $totalValue > 0 ? $totalValue : null,
         ]);
 
         return $quote;
+    }
+
+    /**
+     * Convert a quote item amount to the base currency at the rate the item was quoted at.
+     */
+    protected function toBaseAmount(float $amount, $item): float
+    {
+        if ((float) $item->price <= 0) {
+            return $amount;
+        }
+
+        return round($amount * (float) $item->base_price / (float) $item->price, 4);
     }
 
     /**
@@ -413,8 +433,9 @@ class CustomerQuoteRepository extends Repository
      */
     private function calculateExpirationDate(): Carbon
     {
-        $period = (int) core()->getConfigData('b2b.quotes.settings.default_expiration_period', 30);
-        $unit = core()->getConfigData('b2b.quotes.settings.expiration_period_unit', 'days');
+        $period = (int) (core()->getConfigData('b2b.quotes.settings.default_expiration_period') ?: 30);
+
+        $unit = core()->getConfigData('b2b.quotes.settings.expiration_period_unit') ?: 'days';
 
         return match ($unit) {
             'weeks' => now()->addWeeks($period),

@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => 'Asignar producto',
             'attributes' => 'Atributos',
             'b2b' => 'B2B Suite',
             'companies' => 'Empresas',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => 'Adjuntos de la cotización',
                         'quote-deleted' => 'Cotización eliminada correctamente.',
                         'quote-description' => 'Descripción',
+                        'quote-expired' => 'Esta cotización ha caducado.',
                         'quote-information' => 'Información de la cotización',
                         'quote-item-updated' => 'Artículo(s) de la cotización actualizado(s) correctamente.',
                         'quote-items' => 'Artículos de la cotización',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => 'No tienes productos en tu lista de pedidos. ¡Empieza a añadir algunos!',
                     'item-updated' => 'Artículos de la lista de pedidos actualizados correctamente.',
                     'items-selected' => ':count artículos seleccionados',
+                    'limit-reached' => 'Has alcanzado el número máximo de listas de pedidos.',
                     'move-to-cart' => 'Mover seleccionados al carrito',
                     'move-to-cart-success' => 'Producto movido al carrito correctamente.',
                     'not-found' => 'Lista de pedidos no encontrada.',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Rol creado correctamente.',
+                    'delete-failed' => 'No se pudo eliminar el rol.',
                     'delete-success' => 'Rol eliminado correctamente.',
                     'update-success' => 'Rol actualizado correctamente.',
 

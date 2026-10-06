@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => '商品の割り当て',
             'attributes' => '属性',
             'b2b' => 'B2B Suite',
             'companies' => '企業',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => '見積もり添付ファイル',
                         'quote-deleted' => '見積もりが正常に削除されました。',
                         'quote-description' => '説明',
+                        'quote-expired' => 'この見積もりは有効期限が切れています。',
                         'quote-information' => '見積もり情報',
                         'quote-item-updated' => '見積もり項目が正常に更新されました。',
                         'quote-items' => '見積もり項目',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => '要求リストに商品がありません。追加を始めましょう！',
                     'item-updated' => '要求リストの項目が正常に更新されました。',
                     'items-selected' => ':count 件の項目を選択',
+                    'limit-reached' => '要求リストの上限数に達しました。',
                     'move-to-cart' => '選択項目をカートへ移動',
                     'move-to-cart-success' => '商品がカートに正常に移動されました。',
                     'not-found' => '要求リストが見つかりません。',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'ロールが正常に作成されました。',
+                    'delete-failed' => 'ロールを削除できませんでした。',
                     'delete-success' => 'ロールが正常に削除されました。',
                     'update-success' => 'ロールが正常に更新されました。',
 

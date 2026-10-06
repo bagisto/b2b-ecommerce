@@ -26,7 +26,7 @@ return new class extends Migration
             $table->decimal('total', 18, 4)->default(0);
             $table->decimal('base_total', 18, 4)->default(0);
             $table->boolean('is_accepted')->default(false);
-            $table->string('accepted_by');
+            $table->string('accepted_by')->nullable();
             $table->timestamps();
 
             $table->foreign('quote_id')->references('id')->on('b2b_customer_quotes')->onDelete('cascade');

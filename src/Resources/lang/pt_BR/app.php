@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => 'Atribuir Produto',
             'attributes' => 'Atributos',
             'b2b' => 'B2B Suite',
             'companies' => 'Empresas',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => 'Anexos da Cotação',
                         'quote-deleted' => 'Cotação excluída com sucesso.',
                         'quote-description' => 'Descrição',
+                        'quote-expired' => 'Esta cotação expirou.',
                         'quote-information' => 'Informações da Cotação',
                         'quote-item-updated' => 'Itens da cotação atualizados com sucesso.',
                         'quote-items' => 'Itens da Cotação',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => 'Você não tem produtos em sua lista de requisição. Comece a adicionar alguns!',
                     'item-updated' => 'Itens da lista de requisição atualizados com sucesso.',
                     'items-selected' => ':count Itens Selecionados',
+                    'limit-reached' => 'Você atingiu o número máximo de listas de requisição.',
                     'move-to-cart' => 'Mover Selecionados para o Carrinho',
                     'move-to-cart-success' => 'Produto movido para o carrinho com sucesso.',
                     'not-found' => 'Lista de requisição não encontrada.',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Função criada com sucesso.',
+                    'delete-failed' => 'Não foi possível excluir a função.',
                     'delete-success' => 'Função excluída com sucesso.',
                     'update-success' => 'Função atualizada com sucesso.',
 

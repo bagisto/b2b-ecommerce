@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => 'Assegna prodotto',
             'attributes' => 'Attributi',
             'b2b' => 'B2B Suite',
             'companies' => 'Aziende',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => 'Allegati del preventivo',
                         'quote-deleted' => 'Preventivo eliminato con successo.',
                         'quote-description' => 'Descrizione',
+                        'quote-expired' => 'Questo preventivo è scaduto.',
                         'quote-information' => 'Informazioni preventivo',
                         'quote-item-updated' => 'Articolo/i del preventivo aggiornato/i con successo.',
                         'quote-items' => 'Articoli del preventivo',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => 'Non hai prodotti nella tua lista di richiesta. Inizia ad aggiungerne!',
                     'item-updated' => 'Articoli della lista di richiesta aggiornati con successo.',
                     'items-selected' => ':count articoli selezionati',
+                    'limit-reached' => 'Hai raggiunto il numero massimo di liste di richiesta.',
                     'move-to-cart' => 'Sposta i selezionati nel carrello',
                     'move-to-cart-success' => 'Prodotto spostato nel carrello con successo.',
                     'not-found' => 'Lista di richiesta non trovata.',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Ruolo creato con successo.',
+                    'delete-failed' => 'Impossibile eliminare il ruolo.',
                     'delete-success' => 'Ruolo eliminato con successo.',
                     'update-success' => 'Ruolo aggiornato con successo.',
 

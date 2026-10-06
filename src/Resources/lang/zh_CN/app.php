@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => '分配产品',
             'attributes' => '属性',
             'b2b' => 'B2B Suite',
             'companies' => '公司',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => '报价单附件',
                         'quote-deleted' => '报价单删除成功。',
                         'quote-description' => '描述',
+                        'quote-expired' => '此报价单已过期。',
                         'quote-information' => '报价单信息',
                         'quote-item-updated' => '报价单项目更新成功。',
                         'quote-items' => '报价单项目',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => '您的申购清单中没有任何产品。开始添加吧！',
                     'item-updated' => '申购清单项目更新成功。',
                     'items-selected' => '已选 :count 个项目',
+                    'limit-reached' => '您已达到申购清单的数量上限。',
                     'move-to-cart' => '将所选移至购物车',
                     'move-to-cart-success' => '产品已成功移至购物车。',
                     'not-found' => '未找到申购清单。',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => '角色创建成功。',
+                    'delete-failed' => '角色删除失败。',
                     'delete-success' => '角色删除成功。',
                     'update-success' => '角色更新成功。',
 

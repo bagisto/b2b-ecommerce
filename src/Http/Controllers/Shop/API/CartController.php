@@ -9,6 +9,7 @@ use Webkul\B2BSuite\Repositories\CustomerQuoteItemRepository;
 use Webkul\CartRule\Repositories\CartRuleCouponRepository;
 use Webkul\Checkout\Facades\Cart;
 use Webkul\Customer\Repositories\CustomerRepository;
+use Webkul\Product\Exceptions\InsufficientProductInventoryException;
 use Webkul\Product\Repositories\ProductRepository;
 use Webkul\Shop\Http\Controllers\API\CartController as BaseCartController;
 use Webkul\Shop\Http\Resources\CartResource;
@@ -37,6 +38,10 @@ class CartController extends BaseCartController
             'product_id' => 'required|integer|exists:products,id',
             'is_buy_now' => 'integer|in:0,1',
             'quantity' => 'integer|min:1',
+            'qty' => 'array',
+            'qty.*' => 'integer|min:0',
+            'bundle_option_qty' => 'array',
+            'bundle_option_qty.*' => 'integer|min:1',
         ]);
 
         $product = $this->productRepository->with('parent')->findOrFail(request()->input('product_id'));
@@ -88,6 +93,10 @@ class CartController extends BaseCartController
                 'data' => new CartResource($cart),
                 'message' => trans('shop::app.checkout.cart.item-add-to-cart'),
             ], $response));
+        } catch (InsufficientProductInventoryException $exception) {
+            return response()->json([
+                'message' => $exception->getMessage(),
+            ], Response::HTTP_BAD_REQUEST);
         } catch (\Exception $exception) {
             return response()->json([
                 'redirect_uri' => route('shop.product_or_category.index', $product->url_key),
@@ -101,6 +110,11 @@ class CartController extends BaseCartController
      */
     public function update(): JsonResource
     {
+        $this->validate(request(), [
+            'qty' => 'present|array',
+            'qty.*' => 'required|integer|min:0',
+        ]);
+
         try {
             $data = request()->input();
 

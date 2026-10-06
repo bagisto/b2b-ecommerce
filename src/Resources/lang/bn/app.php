@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => 'পণ্য বরাদ্দ করুন',
             'attributes' => 'অ্যাট্রিবিউট',
             'b2b' => 'B2B Suite',
             'companies' => 'কোম্পানি',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => 'উদ্ধৃতি সংযুক্তি',
                         'quote-deleted' => 'উদ্ধৃতি সফলভাবে মুছে ফেলা হয়েছে।',
                         'quote-description' => 'বিবরণ',
+                        'quote-expired' => 'এই উদ্ধৃতির মেয়াদ শেষ হয়ে গেছে।',
                         'quote-information' => 'উদ্ধৃতির তথ্য',
                         'quote-item-updated' => 'উদ্ধৃতি আইটেম সফলভাবে আপডেট হয়েছে।',
                         'quote-items' => 'উদ্ধৃতি আইটেম',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => 'আপনার রিকুইজিশন তালিকায় কোনো পণ্য নেই। কিছু যোগ করা শুরু করুন!',
                     'item-updated' => 'রিকুইজিশন তালিকা আইটেম সফলভাবে আপডেট হয়েছে।',
                     'items-selected' => ':count টি আইটেম নির্বাচিত',
+                    'limit-reached' => 'আপনি রিকুইজিশন তালিকার সর্বোচ্চ সংখ্যায় পৌঁছে গেছেন।',
                     'move-to-cart' => 'নির্বাচিতগুলি কার্টে সরান',
                     'move-to-cart-success' => 'পণ্য সফলভাবে কার্টে সরানো হয়েছে।',
                     'not-found' => 'রিকুইজিশন তালিকা পাওয়া যায়নি।',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'ভূমিকা সফলভাবে তৈরি হয়েছে।',
+                    'delete-failed' => 'ভূমিকা মুছে ফেলা যায়নি।',
                     'delete-success' => 'ভূমিকা সফলভাবে মুছে ফেলা হয়েছে।',
                     'update-success' => 'ভূমিকা সফলভাবে আপডেট হয়েছে।',
 

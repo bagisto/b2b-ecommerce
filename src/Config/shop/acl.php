@@ -64,7 +64,7 @@ return [
         'name' => 'b2b::app.shop.acl.quotes',
         'route' => [
             'shop.customers.account.quotes.index',
-            'shop.customers.account.quotes.get_product',
+            'b2b.shop.quotes.store',
         ],
         'sort' => 3,
     ], [

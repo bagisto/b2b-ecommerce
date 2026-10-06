@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => 'Призначити товар',
             'attributes' => 'Атрибути',
             'b2b' => 'B2B Suite',
             'companies' => 'Компанії',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => 'Вкладення пропозиції',
                         'quote-deleted' => 'Комерційну пропозицію успішно видалено.',
                         'quote-description' => 'Опис',
+                        'quote-expired' => 'Термін дії цієї комерційної пропозиції закінчився.',
                         'quote-information' => 'Інформація про пропозицію',
                         'quote-item-updated' => 'Позиції пропозиції успішно оновлено.',
                         'quote-items' => 'Позиції пропозиції',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => 'У вашому списку заявок немає товарів. Почніть додавати!',
                     'item-updated' => 'Позиції списку заявок успішно оновлено.',
                     'items-selected' => 'Вибрано позицій: :count',
+                    'limit-reached' => 'Ви досягли максимальної кількості списків заявок.',
                     'move-to-cart' => 'Перемістити вибране до кошика',
                     'move-to-cart-success' => 'Товар успішно переміщено до кошика.',
                     'not-found' => 'Список заявок не знайдено.',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Роль успішно створено.',
+                    'delete-failed' => 'Не вдалося видалити роль.',
                     'delete-success' => 'Роль успішно видалено.',
                     'update-success' => 'Роль успішно оновлено.',
 

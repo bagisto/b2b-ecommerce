@@ -3,7 +3,6 @@
 namespace Webkul\B2BSuite\Http\Controllers\Shop;
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\View\View;
@@ -66,7 +65,9 @@ class RequisitionListController extends Controller
                 ];
             });
 
-        $totalRequisition = $this->customerRequisitionRepository->count();
+        $totalRequisition = $this->customerRequisitionRepository->count([
+            'customer_id' => auth()->guard('customer')->user()->id,
+        ]);
 
         return new JsonResponse([
             'requisitions' => $requisitions,
@@ -80,6 +81,14 @@ class RequisitionListController extends Controller
     public function store(): JsonResponse
     {
         $customerId = auth()->guard('customer')->user()->id;
+
+        $totalRequisition = $this->customerRequisitionRepository->count(['customer_id' => $customerId]);
+
+        if ($totalRequisition >= (int) core()->getConfigData('b2b.general.settings.no_requisition_list')) {
+            return new JsonResponse([
+                'message' => trans('b2b::app.shop.customers.account.requisitions.limit-reached'),
+            ], 422);
+        }
 
         Event::dispatch('customer.requisitions.create.before');
 
@@ -96,14 +105,12 @@ class RequisitionListController extends Controller
         $requisition = $this->customerRequisitionRepository->create($data);
 
         if ($requisition) {
-            $totalRequisition = $this->customerRequisitionRepository->count();
-
             if ($isDefault = request()->has('is_default')) {
                 $this->customerRequisitionRepository->where('customer_id', $customer->id)->update(['is_default' => 0]);
             }
 
             $requisition->update([
-                'is_default' => $isDefault ? 1 : ($totalRequisition ? false : true),
+                'is_default' => $isDefault || ! $totalRequisition,
             ]);
         }
 
@@ -119,7 +126,7 @@ class RequisitionListController extends Controller
     }
 
     /**
-     * For editing the existing addresses of current logged in customer.
+     * Show the edit form for one of the current customer's requisition lists.
      *
      * @return View
      */
@@ -138,9 +145,9 @@ class RequisitionListController extends Controller
     }
 
     /**
-     * Edit's the pre-made resource of customer called Address.
+     * Update one of the current customer's requisition lists.
      *
-     * @return RedirectResponse
+     * @return JsonResponse
      */
     public function update(int $id, Request $request)
     {
@@ -152,6 +159,13 @@ class RequisitionListController extends Controller
         ]);
 
         $customerId = auth()->guard('customer')->user()->id;
+
+        if (! $this->customerRequisitionRepository->findOneWhere([
+            'id' => $id,
+            'customer_id' => $customerId,
+        ])) {
+            abort(404);
+        }
 
         Event::dispatch('customer.requisitions.update.before', $id);
 

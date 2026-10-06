@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => 'उत्पाद असाइन करें',
             'attributes' => 'विशेषताएँ',
             'b2b' => 'B2B Suite',
             'companies' => 'कंपनियाँ',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => 'कोटेशन संलग्नक',
                         'quote-deleted' => 'कोटेशन सफलतापूर्वक हटाया गया।',
                         'quote-description' => 'विवरण',
+                        'quote-expired' => 'इस कोटेशन की अवधि समाप्त हो गई है।',
                         'quote-information' => 'कोटेशन जानकारी',
                         'quote-item-updated' => 'कोटेशन आइटम सफलतापूर्वक अपडेट किए गए।',
                         'quote-items' => 'कोटेशन आइटम',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => 'आपकी अनुरोध सूची में कोई उत्पाद नहीं है। कुछ जोड़ना शुरू करें!',
                     'item-updated' => 'अनुरोध सूची आइटम सफलतापूर्वक अपडेट किए गए।',
                     'items-selected' => ':count आइटम चयनित',
+                    'limit-reached' => 'आप अनुरोध सूचियों की अधिकतम संख्या तक पहुँच गए हैं।',
                     'move-to-cart' => 'चयनित को कार्ट में ले जाएँ',
                     'move-to-cart-success' => 'उत्पाद सफलतापूर्वक कार्ट में ले जाया गया।',
                     'not-found' => 'अनुरोध सूची नहीं मिली।',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'भूमिका सफलतापूर्वक बनाई गई।',
+                    'delete-failed' => 'भूमिका हटाई नहीं जा सकी।',
                     'delete-success' => 'भूमिका सफलतापूर्वक हटाई गई।',
                     'update-success' => 'भूमिका सफलतापूर्वक अपडेट की गई।',
 

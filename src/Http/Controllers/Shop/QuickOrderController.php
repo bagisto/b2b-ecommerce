@@ -46,7 +46,7 @@ class QuickOrderController extends Controller
     public function store()
     {
         try {
-            $maxFileSizeMB = (int) (core()->getConfigData('b2b.quotes.settings.maximum_file_size') ?: 2);
+            $maxFileSizeMB = (int) (core()->getConfigData('b2b.quotes.settings.maximum_file_size') ?: 10);
 
             $this->validate(request(), [
                 'products' => 'required_without:upload_file|array',

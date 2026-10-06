@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => 'Affecter un produit',
             'attributes' => 'Attributs',
             'b2b' => 'B2B Suite',
             'companies' => 'Entreprises',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => 'Pièces jointes du devis',
                         'quote-deleted' => 'Devis supprimé avec succès.',
                         'quote-description' => 'Description',
+                        'quote-expired' => 'Ce devis a expiré.',
                         'quote-information' => 'Informations sur le devis',
                         'quote-item-updated' => 'Article(s) du devis mis à jour avec succès.',
                         'quote-items' => 'Articles du devis',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => 'Vous n\'avez aucun produit dans votre liste de réquisition. Commencez à en ajouter !',
                     'item-updated' => 'Articles de la liste de réquisition mis à jour avec succès.',
                     'items-selected' => ':count articles sélectionnés',
+                    'limit-reached' => 'Vous avez atteint le nombre maximal de listes de réquisition.',
                     'move-to-cart' => 'Déplacer la sélection vers le panier',
                     'move-to-cart-success' => 'Produit déplacé vers le panier avec succès.',
                     'not-found' => 'Liste de réquisition introuvable.',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Rôle créé avec succès.',
+                    'delete-failed' => 'Le rôle n\'a pas pu être supprimé.',
                     'delete-success' => 'Rôle supprimé avec succès.',
                     'update-success' => 'Rôle mis à jour avec succès.',
 

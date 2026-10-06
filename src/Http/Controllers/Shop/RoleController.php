@@ -69,15 +69,7 @@ class RoleController extends Controller
 
         Event::dispatch('customer.role.create.before');
 
-        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
-
-        if ($currentAdmin->type === 'company') {
-            $companyId = $currentAdmin->id;
-        } else {
-            $company = $currentAdmin->companies()->first();
-
-            $companyId = $company ? $company->id : $currentAdmin->id;
-        }
+        $companyId = $this->currentCompanyId();
 
         $data = array_merge(request()->only([
             'name',
@@ -104,7 +96,16 @@ class RoleController extends Controller
      */
     public function edit($id)
     {
-        $role = $this->companyRoleRepository->findOrFail($id);
+        $role = $this->companyRoleRepository->findOneWhere([
+            'id' => $id,
+            'customer_id' => $this->currentCompanyId(),
+        ]);
+
+        if (! $role) {
+            session()->flash('error', trans('b2b::app.shop.customers.account.users.un-auth-access'));
+
+            return redirect()->route('shop.customers.account.roles.index');
+        }
 
         return view('b2b::shop.customers.account.roles.edit', compact('role'));
     }
@@ -122,14 +123,26 @@ class RoleController extends Controller
             'description' => 'required',
         ]);
 
-        /**
-         * Check for other customers if the role has been changed from all to custom.
-         */
-        $isChangedFromAll = request('permission_type') == 'custom' && $this->companyRoleRepository->find($id)->permission_type == 'all';
+        $companyId = $this->currentCompanyId();
 
+        $role = $this->companyRoleRepository->findOneWhere([
+            'id' => $id,
+            'customer_id' => $companyId,
+        ]);
+
+        if (! $role) {
+            session()->flash('error', trans('b2b::app.shop.customers.account.users.un-auth-access'));
+
+            return redirect()->route('shop.customers.account.roles.index');
+        }
+
+        /**
+         * Keep at least one company user with full access when a role moves from all to custom.
+         */
         if (
-            $isChangedFromAll
-            && $this->companyRoleRepository->countCustomersWithAllAccess() === 1
+            request('permission_type') == 'custom'
+            && $role->permission_type == 'all'
+            && $this->companyRoleRepository->countCustomersWithAllAccess($companyId, $role->id) === 0
         ) {
             session()->flash('error', trans('b2b::app.shop.customers.account.roles.being-used'));
 
@@ -142,7 +155,7 @@ class RoleController extends Controller
             'permission_type',
         ]), [
             'permissions' => request()->has('permissions') ? request('permissions') : [],
-            'customer_id' => auth()->guard('customer')->user()->id,
+            'customer_id' => $companyId,
         ]);
 
         Event::dispatch('customer.role.update.before', $id);
@@ -161,7 +174,18 @@ class RoleController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        $role = $this->companyRoleRepository->findOrFail($id);
+        $companyId = $this->currentCompanyId();
+
+        $role = $this->companyRoleRepository->findOneWhere([
+            'id' => $id,
+            'customer_id' => $companyId,
+        ]);
+
+        if (! $role) {
+            return new JsonResponse([
+                'message' => trans('b2b::app.shop.customers.account.users.un-auth-access'),
+            ], 401);
+        }
 
         if ($role->customers->count() >= 1) {
             return new JsonResponse([
@@ -169,7 +193,7 @@ class RoleController extends Controller
             ], 400);
         }
 
-        if ($this->companyRoleRepository->count() == 1) {
+        if ($this->companyRoleRepository->count(['customer_id' => $companyId]) == 1) {
             return new JsonResponse([
                 'message' => trans(
                     'admin::app.settings.roles.last-delete-error'
@@ -189,9 +213,21 @@ class RoleController extends Controller
         }
 
         return new JsonResponse([
-            'message' => trans(
-                'shop.customers.account.roles.delete-failed'
-            ),
+            'message' => trans('b2b::app.shop.customers.account.roles.delete-failed'),
         ], 500);
+    }
+
+    /**
+     * Resolve the company the logged-in customer acts for.
+     */
+    protected function currentCompanyId(): int
+    {
+        $customer = $this->customerRepository->find(auth()->guard('customer')->user()->id);
+
+        if ($customer->type === 'company') {
+            return $customer->id;
+        }
+
+        return $customer->companies()->first()?->id ?? $customer->id;
     }
 }

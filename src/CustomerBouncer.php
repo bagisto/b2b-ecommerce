@@ -3,6 +3,7 @@
 namespace Webkul\B2BSuite;
 
 use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
+use Webkul\Customer\Repositories\CustomerRepository;
 
 class CustomerBouncer
 {
@@ -37,7 +38,10 @@ class CustomerBouncer
      *
      * @return void
      */
-    public function __construct(protected CompanyRoleRepository $roleRepo) {}
+    public function __construct(
+        protected CompanyRoleRepository $roleRepo,
+        protected CustomerRepository $customerRepository,
+    ) {}
 
     /**
      * Check if the current logged-in customer has permission for a given key.
@@ -65,11 +69,17 @@ class CustomerBouncer
             return false;
         }
 
-        $role = $customer->type === 'company'
-            ? $this->roleRepo->findWhere(['customer_id' => $customer->id])->first()
-            : $this->roleRepo->find($customer->company_role_id);
+        $role = $customer->company_role_id
+            ? $this->roleRepo->find($customer->company_role_id)
+            : $this->roleRepo->findWhere(['customer_id' => $customer->id])->first();
 
-        if (! $role) {
+        /**
+         * A disabled company's users lose every company feature.
+         */
+        if (
+            ! $role
+            || ! $this->customerRepository->find($role->customer_id)?->status
+        ) {
             return false;
         }
 
