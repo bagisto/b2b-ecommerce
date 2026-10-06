@@ -15,36 +15,7 @@
         <x-shop::layouts.account.navigation />
     </div>
     
-    <v-requisitions>
-        <div class="mx-4 flex-auto max-md:mx-6 max-sm:mx-4">
-            <div class="mb-8 flex justify-between max-sm:mb-5">
-                <div class="flex items-center">
-                    <!-- Back Button -->
-                    <a
-                        class="grid md:hidden"
-                        href="{{ route('shop.customers.account.profile.index') }}"
-                    >
-                        <span class="icon-arrow-left rtl:icon-arrow-right text-2xl"></span>
-                    </a>
-        
-                    <h2 class="text-2xl font-medium max-md:text-xl max-sm:text-base ltr:ml-2.5 md:ltr:ml-0 rtl:mr-2.5 md:rtl:mr-0">
-                        @lang('b2b::app.shop.customers.account.requisitions.title')
-                    </h2>
-                </div>
-
-                @if ((int) core()->getConfigData('b2b.general.settings.no_requisition_list') > $totalRequisition)
-                    <div class="flex items-center">
-                        <a
-                            href="{{ route('shop.customers.account.requisitions.create') }}"
-                            class="secondary-button border-zinc-200 px-5 py-3 font-normal max-md:rounded-lg max-md:py-2 max-sm:py-1.5 max-sm:text-sm"
-                        >
-                            @lang('b2b::app.shop.customers.account.requisitions.btn-create') 
-                        </a>
-                    </div>
-                @endif
-            </div>
-        </div>
-    </v-requisitions>
+    <v-requisitions></v-requisitions>
 
     @pushOnce('scripts')
         <script
