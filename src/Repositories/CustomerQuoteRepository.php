@@ -5,6 +5,7 @@ namespace Webkul\B2BSuite\Repositories;
 use Carbon\Carbon;
 use Illuminate\Container\Container;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Webkul\B2BSuite\Contracts\CustomerQuote;
@@ -49,26 +50,30 @@ class CustomerQuoteRepository extends Repository
 
         $data = array_merge($data, $this->prepareCartData($cart));
 
-        $quote = $this->model->create($data);
+        $quote = DB::transaction(function () use ($data, $cart) {
+            $quote = $this->model->create($data);
 
-        $quoteItemDetails = $this->prepareCartData($cart, $quote);
+            $quoteItemDetails = $this->prepareCartData($cart, $quote);
 
-        if (! empty($quoteItemDetails['items'])) {
-            foreach ($quoteItemDetails['items'] as $item) {
-                $this->customerQuoteItemRepository->create($item);
+            if (! empty($quoteItemDetails['items'])) {
+                foreach ($quoteItemDetails['items'] as $item) {
+                    $this->customerQuoteItemRepository->create($item);
+                }
             }
-        }
 
-        $this->customerQuoteMessageRepository->create([
-            'quote_id' => $quote->id,
-            'user_id' => $data['customer_id'],
-            'user_type' => isset($data['customer_id']) ? 'customer' : 'admin',
-            'message' => $data['message'] ?? trans('b2b::app.shop.checkout.cart.request-quote.default-message', [
-                'status' => $quote->status,
-            ]),
-        ]);
+            $this->customerQuoteMessageRepository->create([
+                'quote_id' => $quote->id,
+                'user_id' => $data['customer_id'],
+                'user_type' => isset($data['customer_id']) ? 'customer' : 'admin',
+                'message' => $data['message'] ?? trans('b2b::app.shop.checkout.cart.request-quote.default-message', [
+                    'status' => $quote->status,
+                ]),
+            ]);
 
-        $this->upload($data, $quote, 'attachments');
+            $this->upload($data, $quote, 'attachments');
+
+            return $quote;
+        });
 
         Cart::removeCart($cart);
 
