@@ -2,7 +2,7 @@
 
 This changelog consists of the bug & security updates.
 
-## **v3.0.0 (21st of August 2026)** - *Release*
+## **v3.0.0 (6th of October 2026)** - *Release*
 
 - The suite now targets **Bagisto v2.5** on Laravel 13 and PHP 8.4. The v2.0 line remains the one to install on Bagisto v2.4.
 
