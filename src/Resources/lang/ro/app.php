@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => 'Atribuire produs',
             'attributes' => 'Atribute',
             'b2b' => 'B2B Suite',
             'companies' => 'Companii',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => 'Atașamente ofertă',
                         'quote-deleted' => 'Oferta a fost ștearsă cu succes.',
                         'quote-description' => 'Descriere',
+                        'quote-expired' => 'Această ofertă a expirat.',
                         'quote-information' => 'Informații ofertă',
                         'quote-item-updated' => 'Articolele ofertei au fost actualizate cu succes.',
                         'quote-items' => 'Articole ofertă',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => 'Nu aveți produse în lista dvs. de solicitare. Începeți să adăugați!',
                     'item-updated' => 'Articolele listei de solicitare au fost actualizate cu succes.',
                     'items-selected' => ':count articole selectate',
+                    'limit-reached' => 'Ați atins numărul maxim de liste de solicitare.',
                     'move-to-cart' => 'Mută selectatele în coș',
                     'move-to-cart-success' => 'Produsul a fost mutat în coș cu succes.',
                     'not-found' => 'Lista de solicitare nu a fost găsită.',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Rolul a fost creat cu succes.',
+                    'delete-failed' => 'Rolul nu a putut fi șters.',
                     'delete-success' => 'Rolul a fost șters cu succes.',
                     'update-success' => 'Rolul a fost actualizat cu succes.',
 

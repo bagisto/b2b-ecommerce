@@ -29,11 +29,10 @@ class EnsurePayByCreditWithinLimit
 
         $creditManager = app(CreditManager::class);
 
-        $credit = $creditManager->companyCreditFor($cart->customer);
+        $credit = $creditManager->activeCompanyCreditFor($cart->customer);
 
         if (
             ! $credit
-            || ! $credit->status
             || ! $creditManager->canAfford($credit, (float) $cart->base_grand_total)
         ) {
             return response()->json([

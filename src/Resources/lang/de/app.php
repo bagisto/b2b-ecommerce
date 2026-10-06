@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => 'Produkt zuweisen',
             'attributes' => 'Attribute',
             'b2b' => 'B2B Suite',
             'companies' => 'Unternehmen',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => 'Angebotsanhänge',
                         'quote-deleted' => 'Angebot erfolgreich gelöscht.',
                         'quote-description' => 'Beschreibung',
+                        'quote-expired' => 'Dieses Angebot ist abgelaufen.',
                         'quote-information' => 'Angebotsinformationen',
                         'quote-item-updated' => 'Angebotsposition(en) erfolgreich aktualisiert.',
                         'quote-items' => 'Angebotspositionen',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => 'Sie haben keine Produkte in Ihrer Bedarfsliste. Fügen Sie welche hinzu!',
                     'item-updated' => 'Positionen der Bedarfsliste erfolgreich aktualisiert.',
                     'items-selected' => ':count Positionen ausgewählt',
+                    'limit-reached' => 'Sie haben die maximale Anzahl an Bedarfslisten erreicht.',
                     'move-to-cart' => 'Ausgewählte in den Warenkorb verschieben',
                     'move-to-cart-success' => 'Produkt erfolgreich in den Warenkorb verschoben.',
                     'not-found' => 'Bedarfsliste nicht gefunden.',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Rolle erfolgreich erstellt.',
+                    'delete-failed' => 'Rolle konnte nicht gelöscht werden.',
                     'delete-success' => 'Rolle erfolgreich gelöscht.',
                     'update-success' => 'Rolle erfolgreich aktualisiert.',
 

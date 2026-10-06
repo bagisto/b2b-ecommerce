@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => 'Assign-Product',
             'attributes' => 'Attributes',
             'b2b' => 'B2B Suite',
             'companies' => 'Companies',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => 'Quotation Attachments',
                         'quote-deleted' => 'Quotation deleted successfully.',
                         'quote-description' => 'Description',
+                        'quote-expired' => 'This quotation has expired.',
                         'quote-information' => 'Quotation Information',
                         'quote-item-updated' => 'Quotation item(s) updated successfully.',
                         'quote-items' => 'Quotation Items',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => 'You have no products in your requisition list. Start adding some!',
                     'item-updated' => 'Requisition list items updated successfully.',
                     'items-selected' => ':count Items Selected',
+                    'limit-reached' => 'You have reached the maximum number of requisition lists.',
                     'move-to-cart' => 'Move Selected To Cart',
                     'move-to-cart-success' => 'Product moved to cart successfully.',
                     'not-found' => 'Requisition list not found.',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Role created successfully.',
+                    'delete-failed' => 'Role could not be deleted.',
                     'delete-success' => 'Role deleted successfully.',
                     'update-success' => 'Role updated successfully.',
 

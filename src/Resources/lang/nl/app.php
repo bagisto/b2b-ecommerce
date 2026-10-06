@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => 'Product toewijzen',
             'attributes' => 'Attributen',
             'b2b' => 'B2B Suite',
             'companies' => 'Bedrijven',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => 'Offertebijlagen',
                         'quote-deleted' => 'Offerte succesvol verwijderd.',
                         'quote-description' => 'Beschrijving',
+                        'quote-expired' => 'Deze offerte is verlopen.',
                         'quote-information' => 'Offertegegevens',
                         'quote-item-updated' => 'Offerte-item(s) succesvol bijgewerkt.',
                         'quote-items' => 'Offerte-items',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => 'U heeft geen producten in uw aanvraaglijst. Voeg er enkele toe!',
                     'item-updated' => 'Aanvraaglijstitems succesvol bijgewerkt.',
                     'items-selected' => ':count items geselecteerd',
+                    'limit-reached' => 'U hebt het maximale aantal aanvraaglijsten bereikt.',
                     'move-to-cart' => 'Selectie naar winkelwagen verplaatsen',
                     'move-to-cart-success' => 'Product succesvol naar winkelwagen verplaatst.',
                     'not-found' => 'Aanvraaglijst niet gevonden.',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Rol succesvol aangemaakt.',
+                    'delete-failed' => 'Rol kon niet worden verwijderd.',
                     'delete-success' => 'Rol succesvol verwijderd.',
                     'update-success' => 'Rol succesvol bijgewerkt.',
 

@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => 'Assignar producte',
             'attributes' => 'Atributs',
             'b2b' => 'B2B Suite',
             'companies' => 'Empreses',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => 'Adjunts del pressupost',
                         'quote-deleted' => 'Pressupost eliminat correctament.',
                         'quote-description' => 'Descripció',
+                        'quote-expired' => 'Aquest pressupost ha caducat.',
                         'quote-information' => 'Informació del pressupost',
                         'quote-item-updated' => 'Article/s del pressupost actualitzat/s correctament.',
                         'quote-items' => 'Articles del pressupost',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => 'No teniu cap producte a la vostra llista de requisició. Comenceu a afegir-ne!',
                     'item-updated' => 'Articles de la llista de requisició actualitzats correctament.',
                     'items-selected' => ':count articles seleccionats',
+                    'limit-reached' => 'Heu arribat al nombre màxim de llistes de requisició.',
                     'move-to-cart' => 'Moure els seleccionats al carretó',
                     'move-to-cart-success' => 'Producte mogut al carretó correctament.',
                     'not-found' => 'Llista de requisició no trobada.',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Rol creat correctament.',
+                    'delete-failed' => 'No s\'ha pogut eliminar el rol.',
                     'delete-success' => 'Rol eliminat correctament.',
                     'update-success' => 'Rol actualitzat correctament.',
 

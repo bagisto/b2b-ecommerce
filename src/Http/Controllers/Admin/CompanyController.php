@@ -397,8 +397,8 @@ class CompanyController extends Controller
             return $query->whereIn('type', [$data['type'] ?? 'company', 'company'])
                 ->when($repId, fn ($q) => $q->where('sales_rep_id', $repId))
                 ->where(function ($q) use ($term) {
-                    $q->where('email', 'like', $term)
-                        ->orWhereRaw("CONCAT(first_name, ' ', last_name) like ?", [$term]);
+                    $q->where('email', db_grammar()->caseInsensitiveLike(), $term)
+                        ->orWhereRaw(db_grammar()->concatWs(' ', 'first_name', 'last_name').' '.db_grammar()->caseInsensitiveLike().' ?', [$term]);
                 })
                 ->orderBy('created_at', 'desc');
         })->get();

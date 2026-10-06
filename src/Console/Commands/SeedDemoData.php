@@ -2,6 +2,7 @@
 
 namespace Webkul\B2BSuite\Console\Commands;
 
+use Faker\Factory;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Webkul\B2BSuite\Database\Seeders\DemoSeeders\DemoCompanyCatalogSeeder;
@@ -43,6 +44,12 @@ class SeedDemoData extends Command
             $this->components->info('All B2B demo data removed.');
 
             return self::SUCCESS;
+        }
+
+        if (! class_exists(Factory::class)) {
+            $this->components->error('Demo seeding needs fakerphp/faker, which is only installed with Composer\'s development dependencies.');
+
+            return self::FAILURE;
         }
 
         $seeder->companies = max(1, (int) $this->option('companies'));

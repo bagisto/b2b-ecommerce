@@ -96,8 +96,6 @@ class PayByCredit extends Payment
             return null;
         }
 
-        $credit = $this->creditManager->companyCreditFor($this->cart->customer);
-
-        return ($credit && $credit->status) ? $credit : null;
+        return $this->creditManager->activeCompanyCreditFor($this->cart->customer);
     }
 }

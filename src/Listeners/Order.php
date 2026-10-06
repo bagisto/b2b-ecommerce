@@ -8,6 +8,7 @@ use Webkul\B2BSuite\Notifications\Notifier;
 use Webkul\B2BSuite\Repositories\CustomerQuoteRepository;
 use Webkul\Sales\Contracts\Invoice as InvoiceContract;
 use Webkul\Sales\Contracts\Order as OrderContract;
+use Webkul\Sales\Contracts\Refund as RefundContract;
 use Webkul\Sales\Contracts\Shipment as ShipmentContract;
 use Webkul\Sales\Models\Order as SalesOrder;
 use Webkul\Sales\Repositories\OrderRepository;
@@ -72,23 +73,37 @@ class Order extends Base
     }
 
     /**
-     * Free the company credit when a "Pay By Credit" order is cancelled.
+     * Free the uninvoiced part of a "Pay By Credit" order's charge when the order is cancelled.
      */
     public function afterCancelled(OrderContract $order): void
     {
-        if ($order->payment?->method !== 'paybycredit') {
+        $amount = (float) $order->base_grand_total - (float) $order->base_grand_total_invoiced;
+
+        if (
+            $amount <= 0
+            || ! $credit = $this->payByCreditAccount($order)
+        ) {
             return;
         }
 
-        if (! $this->creditManager->isActive()) {
+        $this->creditManager->revert($credit, $amount, $order->id, [
+            'type' => 'system',
+        ]);
+    }
+
+    /**
+     * Give the refunded amount of a "Pay By Credit" order back to the company's credit.
+     */
+    public function afterRefunded(RefundContract $refund): void
+    {
+        if (
+            (float) $refund->base_grand_total <= 0
+            || ! $credit = $this->payByCreditAccount($refund->order)
+        ) {
             return;
         }
 
-        if (! $credit = $this->creditManager->companyCreditFor($order->customer)) {
-            return;
-        }
-
-        $this->creditManager->revert($credit, (float) $order->base_grand_total, $order->id, [
+        $this->creditManager->refund($credit, (float) $refund->base_grand_total, $refund->order_id, [
             'type' => 'system',
         ]);
     }
@@ -184,5 +199,20 @@ class Order extends Base
         $quoteItem->save();
 
         return $quote;
+    }
+
+    /**
+     * The company credit account a "Pay By Credit" order was charged to, when credit is enabled.
+     */
+    protected function payByCreditAccount(OrderContract $order)
+    {
+        if (
+            $order->payment?->method !== 'paybycredit'
+            || ! $this->creditManager->isActive()
+        ) {
+            return null;
+        }
+
+        return $this->creditManager->companyCreditFor($order->customer);
     }
 }

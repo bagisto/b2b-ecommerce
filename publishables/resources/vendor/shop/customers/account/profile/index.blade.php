@@ -24,7 +24,9 @@
     <div class="mx-4 flex-auto max-md:mx-6 max-sm:mx-4">
         <div class="flex flex-col gap-6">
             <!-- ============ Company Information (B2B) ============ -->
-            @include('b2b::shop.customers.account.profile.company-details')
+            @if ((bool) core()->getConfigData('b2b.general.settings.active'))
+                @include('b2b::shop.customers.account.profile.company-details')
+            @endif
 
             <!-- ============ Profile Information ============ -->
             <div class="rounded-xl border border-zinc-200 bg-white">

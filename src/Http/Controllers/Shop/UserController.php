@@ -91,6 +91,14 @@ class UserController extends Controller
             'company_role_id' => ['required'],
         ]);
 
+        $companyId = $this->currentCompanyId();
+
+        if (! $this->isCompanyRole($request->input('company_role_id'), $companyId)) {
+            session()->flash('error', trans('b2b::app.shop.customers.account.users.existing.invalid-role'));
+
+            return redirect()->back()->withInput();
+        }
+
         $customerGroup = core()->getConfigData('customer.settings.create_new_account_options.default_group');
 
         $password = rand(100000, 10000000);
@@ -131,20 +139,7 @@ class UserController extends Controller
 
         $customer = $this->customerRepository->create($data);
 
-        /**
-         * Resolve via the repository to get the B2B customer model (the auth guard returns
-         * the core Customer, which lacks the companies() relation).
-         */
-        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
-
-        if ($currentAdmin->type === 'company') {
-            $companyAdminId = $currentAdmin->id;
-        } else {
-            $companyAdmin = $currentAdmin->companies()->first();
-            $companyAdminId = $companyAdmin ? $companyAdmin->id : $currentAdmin->id;
-        }
-
-        $customer->companies()->sync([$companyAdminId]);
+        $customer->companies()->sync([$companyId]);
 
         Event::dispatch('customer.create.after', $customer);
 
@@ -162,7 +157,7 @@ class UserController extends Controller
             $this->customerRepository->uploadImages($data, $customer);
         }
 
-        if (core()->getConfigData('emails.general.notifications.emails.general.notifications.verification')) {
+        if (core()->getConfigData('customer.settings.email.verification')) {
             session()->flash('success', trans('shop::app.customers.signup-form.success-verify'));
         } else {
             session()->flash('success', trans('b2b::app.shop.customers.account.users.create-success'));
@@ -178,25 +173,19 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        $user = $this->customerRepository->find($id);
+        $companyId = $this->currentCompanyId();
 
         /**
-         * The company owner is listed for context but is not editable through the sub-user form.
+         * Only the company's own sub-users are editable; the owner is listed for context only.
          */
-        if (! $user || $user->type === 'company') {
+        if (! $user = $this->findCompanyUser($id, $companyId)) {
             session()->flash('error', trans('b2b::app.shop.customers.account.users.un-auth-access'));
 
             return redirect()->route('shop.customers.account.users.index');
         }
 
-        $loggedInCustomer = auth()->guard('customer')->user();
-
-        $currentRole = $this->companyRoleRepository->find($loggedInCustomer->company_role_id);
-
-        $companyAdminId = $currentRole->customer_id;
-
         $roles = $this->companyRoleRepository->findWhere([
-            'customer_id' => $companyAdminId,
+            'customer_id' => $companyId,
         ]);
 
         return view('b2b::shop.customers.account.users.edit', compact('user', 'roles'));
@@ -209,12 +198,12 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = $this->customerRepository->find($id);
+        $companyId = $this->currentCompanyId();
 
         /**
-         * The company owner is listed for context but is not editable through the sub-user form.
+         * Only the company's own sub-users are editable; the owner is listed for context only.
          */
-        if (! $user || $user->type === 'company') {
+        if (! $this->findCompanyUser($id, $companyId)) {
             session()->flash('error', trans('b2b::app.shop.customers.account.users.un-auth-access'));
 
             return redirect()->route('shop.customers.account.users.index');
@@ -232,6 +221,12 @@ class UserController extends Controller
             'company_role_id' => ['required'],
         ]);
 
+        if (! $this->isCompanyRole($request->input('company_role_id'), $companyId)) {
+            session()->flash('error', trans('b2b::app.shop.customers.account.users.existing.invalid-role'));
+
+            return redirect()->back()->withInput();
+        }
+
         $data = array_merge($request->only([
             'first_name',
             'last_name',
@@ -248,6 +243,13 @@ class UserController extends Controller
             'status' => $request->has('status') ? 1 : 0,
             'is_suspended' => $request->has('is_suspended') ? 1 : 0,
         ]);
+
+        /**
+         * A user cannot change their own role or deactivate / suspend themselves.
+         */
+        if ((int) $id === (int) auth()->guard('customer')->id()) {
+            unset($data['company_role_id'], $data['status'], $data['is_suspended']);
+        }
 
         if (
             core()->getCurrentChannel()->theme === 'default'
@@ -286,9 +288,9 @@ class UserController extends Controller
             return redirect()->route('shop.customers.account.users.index');
         }
 
-        session()->flash('success', trans('b2b::app.shop.customers.account.users.edit-fail'));
+        session()->flash('error', trans('b2b::app.shop.customers.account.users.edit-fail'));
 
-        return redirect()->back('shop.customers.account.users.index');
+        return redirect()->route('shop.customers.account.users.index');
     }
 
     /**
@@ -538,6 +540,46 @@ class UserController extends Controller
 
         return new JsonResponse([
             'message' => trans('b2b::app.shop.customers.account.users.existing.revoke-success'),
+        ]);
+    }
+
+    /**
+     * Resolve the company the logged-in customer acts for.
+     */
+    protected function currentCompanyId(): int
+    {
+        $customer = $this->customerRepository->find(auth()->guard('customer')->user()->id);
+
+        if ($customer->type === 'company') {
+            return $customer->id;
+        }
+
+        return $customer->companies()->first()?->id ?? $customer->id;
+    }
+
+    /**
+     * Find a sub-user that belongs to the given company.
+     */
+    protected function findCompanyUser($id, int $companyId)
+    {
+        $user = $this->customerRepository->findOneWhere([
+            'id' => $id,
+            'type' => 'user',
+        ]);
+
+        return $user?->companies->contains($companyId)
+            ? $user
+            : null;
+    }
+
+    /**
+     * Whether the role belongs to the given company.
+     */
+    protected function isCompanyRole($roleId, int $companyId): bool
+    {
+        return (bool) $this->companyRoleRepository->findOneWhere([
+            'id' => $roleId,
+            'customer_id' => $companyId,
         ]);
     }
 

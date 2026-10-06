@@ -16,7 +16,7 @@ class CustomerQuoteMessageRepository extends Repository
     }
 
     /**
-     * Get the last quotation message for a specific quote and user type.
+     * Get the quote's latest quotation message, only when it was sent by the given user type.
      *
      * @param  int  $quoteId
      * @param  string  $userType
@@ -24,11 +24,15 @@ class CustomerQuoteMessageRepository extends Repository
      */
     public function getLastQuotationMessage($quoteId, $userType)
     {
-        return $this->model->where('quote_id', $quoteId)
-            ->where('user_type', $userType)
+        $message = $this->model->where('quote_id', $quoteId)
             ->whereHas('quotations')
             ->with('quotations')
             ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->first();
+
+        return $message?->user_type === $userType
+            ? $message
+            : null;
     }
 }

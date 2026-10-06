@@ -50,6 +50,9 @@ class EventServiceProvider extends ServiceProvider
         'sales.order.cancel.after' => [
             [Order::class, 'afterCancelled'],
         ],
+        'sales.refund.save.after' => [
+            [Order::class, 'afterRefunded'],
+        ],
 
         /**
          * Invoice & Shipment related events.

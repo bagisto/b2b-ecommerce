@@ -64,6 +64,22 @@ class CreditManager
     }
 
     /**
+     * The credit account a customer may spend from: both the company and its credit must be active.
+     */
+    public function activeCompanyCreditFor($customer): ?CompanyCredit
+    {
+        $company = $this->companyOf($customer);
+
+        if (! $company?->status) {
+            return null;
+        }
+
+        $credit = $this->find($company->id);
+
+        return $credit?->status ? $credit : null;
+    }
+
+    /**
      * Get the company's credit account, creating an empty one on first use.
      */
     public function getOrCreate($companyId): CompanyCredit

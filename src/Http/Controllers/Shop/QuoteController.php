@@ -14,6 +14,7 @@ use Webkul\B2BSuite\Notifications\Notifier;
 use Webkul\B2BSuite\Repositories\CustomerQuoteAttachmentRepository;
 use Webkul\B2BSuite\Repositories\CustomerQuoteMessageRepository;
 use Webkul\B2BSuite\Repositories\CustomerQuoteRepository;
+use Webkul\Checkout\Facades\Cart;
 use Webkul\Customer\Repositories\CustomerRepository;
 use Webkul\Shop\Http\Controllers\Controller;
 use Webkul\User\Repositories\AdminRepository;
@@ -52,25 +53,40 @@ class QuoteController extends Controller
      */
     public function store(QuoteRequest $quoteRequest): JsonResponse
     {
-        Event::dispatch('b2b.quote.create.before');
-
         $customer = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
         $customerCompany = $customer->companies->first();
 
-        $quoteNumber = $this->customerQuoteRepository->generateQuotationNumber(null);
+        $cart = Cart::getCart();
 
-        $defaultExpirationDays = (int) (core()->getConfigData('b2b.quotes.settings.default_expiration_period') ?? 0);
+        if (
+            ! $customerCompany
+            || ! $cart
+        ) {
+            return new JsonResponse([
+                'message' => trans('b2b::app.shop.customers.account.quotes.view.un-authorized-quote'),
+            ], 400);
+        }
+
+        if ($cart->base_grand_total < (float) core()->getConfigData('b2b.quotes.settings.minimum_amount')) {
+            return new JsonResponse([
+                'message' => core()->getConfigData('b2b.quotes.settings.minimum_amount_message')
+                    ?: trans('b2b::app.shop.checkout.cart.minimum-amount-required'),
+            ], 422);
+        }
+
+        Event::dispatch('b2b.quote.create.before');
+
+        $quoteNumber = $this->customerQuoteRepository->generateQuotationNumber(null);
 
         $data = array_merge([
             'quotation_number' => $quoteNumber['quotation_number'],
             'po_number' => $quoteNumber['po_number'],
             'customer_id' => $customer->id,
-            'company_id' => $customerCompany ? $customerCompany->id : null,
-            'agent_id' => $customerCompany?->sales_rep_id ?? $this->adminRepository->first()?->id ?? null,
+            'company_id' => $customerCompany->id,
+            'agent_id' => $customerCompany->sales_rep_id ?? $this->adminRepository->first()?->id ?? null,
             'customer_name' => $customer->name,
             'customer_email' => $customer->email,
-            'expiration_date' => now()->addDays($defaultExpirationDays)->toDateString(),
         ], $quoteRequest->only([
             'name',
             'description',
@@ -106,23 +122,9 @@ class QuoteController extends Controller
     {
         $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
-        $quoteConditions = [
-            'id' => $id,
-        ];
-
-        if ($currentAdmin->type === 'company') {
-            $quoteConditions['company_id'] = $currentAdmin->id;
-        } else {
-            $company = $currentAdmin->companies()->first();
-
-            if ($company) {
-                $quoteConditions['company_id'] = $company->id;
-            } else {
-                $quoteConditions['customer_id'] = $currentAdmin->id;
-            }
-        }
-
-        $quote = $this->customerQuoteRepository->with(['company', 'company.salesRep', 'company.company_flats', 'agent', 'attachments'])->findOneWhere($quoteConditions);
+        $quote = $this->customerQuoteRepository
+            ->with(['company', 'company.salesRep', 'company.company_flats', 'agent', 'attachments'])
+            ->findOneWhere($this->quoteConditions($currentAdmin, $id));
 
         if (! $quote) {
             session()->flash('error', trans('b2b::app.shop.customers.account.quotes.not-found'));
@@ -145,9 +147,15 @@ class QuoteController extends Controller
             'expected_arrival_date' => 'date|after_or_equal:order_date',
         ]);
 
-        Event::dispatch('b2b.quote.update.before', $id);
+        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
-        $quote = $this->customerQuoteRepository->findOrFail($id);
+        if (! $this->customerQuoteRepository->findOneWhere($this->quoteConditions($currentAdmin, $id))) {
+            session()->flash('error', trans('b2b::app.shop.customers.account.quotes.view.un-authorized-quote'));
+
+            return redirect()->back();
+        }
+
+        Event::dispatch('b2b.quote.update.before', $id);
 
         $data = $request->only([
             'order_date',
@@ -171,21 +179,7 @@ class QuoteController extends Controller
         $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
         try {
-            $quoteConditions = ['id' => $id];
-
-            if ($currentAdmin->type === 'company') {
-                $quoteConditions['company_id'] = $currentAdmin->id;
-            } else {
-                $company = $currentAdmin->companies()->first();
-
-                if ($company) {
-                    $quoteConditions['company_id'] = $company->id;
-                } else {
-                    $quoteConditions['customer_id'] = $currentAdmin->id;
-                }
-            }
-
-            $quote = $this->customerQuoteRepository->findOneWhere($quoteConditions);
+            $quote = $this->customerQuoteRepository->findOneWhere($this->quoteConditions($currentAdmin, $id));
 
             if (! $quote) {
                 session()->flash('error', trans('b2b::app.shop.customers.account.quotes.view.un-authorized-quote'));
@@ -193,15 +187,24 @@ class QuoteController extends Controller
                 return redirect()->back();
             }
 
-            /**
-             * "Accept & Add to Cart" is the buyer's final confirmation: once the admin has
-             * sent an offer (quote in "negotiation"), accepting marks the quote accepted —
-             * which closes the negotiation thread — and adds the negotiated items to the
-             * cart. An already accepted quote can simply be re-added to the cart.
-             */
-            $adminHasOffered = (bool) $this->customerQuoteMessageRepository->getLastQuotationMessage($quote->id, 'admin');
+            if (
+                $quote->expiration_date
+                && now()->startOfDay()->gt($quote->expiration_date)
+            ) {
+                session()->flash('error', trans('b2b::app.shop.customers.account.quotes.view.quote-expired'));
 
-            $canAccept = $quote->status === CustomerQuote::STATUS_NEGOTIATION && $adminHasOffered;
+                return redirect()->back();
+            }
+
+            /**
+             * "Accept & Add to Cart" is the buyer's final confirmation of the admin's offer,
+             * so it is only possible while the latest offer on the quote is the admin's: a
+             * buyer counter-offer must be answered by the admin before it can be accepted.
+             * An already accepted quote can simply be re-added to the cart.
+             */
+            $adminOfferIsLatest = (bool) $this->customerQuoteMessageRepository->getLastQuotationMessage($quote->id, 'admin');
+
+            $canAccept = $quote->status === CustomerQuote::STATUS_NEGOTIATION && $adminOfferIsLatest;
 
             if (
                 ! $canAccept
@@ -285,7 +288,15 @@ class QuoteController extends Controller
      */
     public function getMessages($id, Request $request)
     {
-        $quote = $this->customerQuoteRepository->findOrFail($id);
+        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
+
+        $quote = $this->customerQuoteRepository->findOneWhere($this->quoteConditions($currentAdmin, $id));
+
+        if (! $quote) {
+            return response()->json([
+                'message' => trans('b2b::app.shop.customers.account.quotes.view.un-authorized-quote'),
+            ], 403);
+        }
 
         $query = $quote->messages()
             ->with('quotations', 'quotations.item');
@@ -309,20 +320,32 @@ class QuoteController extends Controller
      */
     public function download($id, $attachmentId)
     {
-        $quote = $this->customerQuoteRepository->findOrFail($id);
-        $attachment = $this->customerQuoteAttachmentRepository->findOrFail($attachmentId);
+        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
-        if ($attachment->customer_quote_id != $quote->id) {
+        $quote = $this->customerQuoteRepository->findOneWhere($this->quoteConditions($currentAdmin, $id));
+
+        $attachment = $quote
+            ? $this->customerQuoteAttachmentRepository->findOneWhere([
+                'id' => $attachmentId,
+                'customer_quote_id' => $quote->id,
+            ])
+            : null;
+
+        if (! $attachment) {
             session()->flash('error', trans('b2b::app.shop.customers.account.quotes.view.un-authorized-quote'));
+
+            return redirect()->back();
+        }
+
+        if (! Storage::disk('public')->exists($attachment->path)) {
+            session()->flash('error', trans('b2b::app.shop.customers.account.quotes.view.no-attachments'));
+
+            return redirect()->back();
         }
 
         $fileName = substr($attachment->path, strrpos($attachment->path, '/') + 1);
 
-        if (Storage::disk('public')->exists($attachment->path)) {
-            return Storage::disk('public')->download($attachment->path, $fileName);
-        } else {
-            session()->flash('error', trans('b2b::app.shop.customers.account.quotes.view.no-attachments'));
-        }
+        return Storage::disk('public')->download($attachment->path, $fileName);
     }
 
     /**
@@ -333,21 +356,7 @@ class QuoteController extends Controller
         $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
         try {
-            $quoteConditions = ['id' => $id];
-
-            if ($currentAdmin->type === 'company') {
-                $quoteConditions['company_id'] = $currentAdmin->id;
-            } else {
-                $company = $currentAdmin->companies()->first();
-
-                if ($company) {
-                    $quoteConditions['company_id'] = $company->id;
-                } else {
-                    $quoteConditions['customer_id'] = $currentAdmin->id;
-                }
-            }
-
-            $quote = $this->customerQuoteRepository->findOneWhere($quoteConditions);
+            $quote = $this->customerQuoteRepository->findOneWhere($this->quoteConditions($currentAdmin, $id));
 
             if (! $quote) {
                 session()->flash('error', trans('b2b::app.shop.customers.account.quotes.view.un-authorized-quote'));
@@ -407,10 +416,19 @@ class QuoteController extends Controller
             }
 
             /**
-             * Re-submit / counter-offer during negotiation.
+             * Re-submit / counter-offer, only while the quote is still open for negotiation.
              */
+            if (! in_array($quote->status, [CustomerQuote::STATUS_OPEN, CustomerQuote::STATUS_NEGOTIATION])) {
+                session()->flash('error', trans('b2b::app.shop.customers.account.quotes.view.un-authorized-quote'));
+
+                return redirect()->back();
+            }
+
             $request->validate([
                 'items' => ['sometimes', 'array', 'min:1'],
+                'items.*.discount_type' => ['nullable', 'in:percent,fixed'],
+                'items.*.discount_value' => ['nullable', 'numeric', 'min:0'],
+                'items.*.negotiated_qty' => ['nullable', 'integer', 'min:1'],
                 'message' => 'required|string|max:1000',
             ]);
 
@@ -460,23 +478,7 @@ class QuoteController extends Controller
                 'message' => 'required|string|max:1000',
             ]);
 
-            $quoteConditions = [
-                'id' => $id,
-            ];
-
-            if ($currentAdmin->type === 'company') {
-                $quoteConditions['company_id'] = $currentAdmin->id;
-            } else {
-                $company = $currentAdmin->companies()->first();
-
-                if ($company) {
-                    $quoteConditions['company_id'] = $company->id;
-                } else {
-                    $quoteConditions['customer_id'] = $currentAdmin->id;
-                }
-            }
-
-            $quote = $this->customerQuoteRepository->findOneWhere($quoteConditions);
+            $quote = $this->customerQuoteRepository->findOneWhere($this->quoteConditions($currentAdmin, $id));
 
             if (! $quote) {
                 if ($request->expectsJson()) {
@@ -535,23 +537,17 @@ class QuoteController extends Controller
         $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
         try {
-            $quoteConditions = ['id' => $id];
+            $quote = $this->customerQuoteRepository->findOneWhere($this->quoteConditions($currentAdmin, $id));
 
-            if ($currentAdmin->type === 'company') {
-                $quoteConditions['company_id'] = $currentAdmin->id;
-            } else {
-                $company = $currentAdmin->companies()->first();
-
-                if ($company) {
-                    $quoteConditions['company_id'] = $company->id;
-                } else {
-                    $quoteConditions['customer_id'] = $currentAdmin->id;
-                }
-            }
-
-            $quote = $this->customerQuoteRepository->findOneWhere($quoteConditions);
-
-            if (! $quote) {
+            if (
+                ! $quote
+                || in_array($quote->status, [
+                    CustomerQuote::STATUS_DRAFT,
+                    CustomerQuote::STATUS_ORDERED,
+                    CustomerQuote::STATUS_COMPLETED,
+                    CustomerQuote::STATUS_REJECTED,
+                ])
+            ) {
                 session()->flash('error', trans('b2b::app.shop.customers.account.quotes.view.un-authorized-quote'));
 
                 return redirect()->back();
@@ -581,5 +577,32 @@ class QuoteController extends Controller
 
             return redirect()->back();
         }
+    }
+
+    /**
+     * Conditions that scope a quote to the customer's company, or to the customer when they have none.
+     */
+    protected function quoteConditions($customer, $id): array
+    {
+        $conditions = [
+            'id' => $id,
+            'soft_deleted' => 0,
+        ];
+
+        if ($customer->type === 'company') {
+            $conditions['company_id'] = $customer->id;
+
+            return $conditions;
+        }
+
+        if ($company = $customer->companies()->first()) {
+            $conditions['company_id'] = $company->id;
+
+            return $conditions;
+        }
+
+        $conditions['customer_id'] = $customer->id;
+
+        return $conditions;
     }
 }

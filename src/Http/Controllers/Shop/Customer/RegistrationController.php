@@ -135,7 +135,7 @@ class RegistrationController extends BaseRegistrationController
 
         if ($requireApproval) {
             session()->flash('success', trans('b2b::app.shop.companies.signup-form.success-pending-approval'));
-        } elseif (core()->getConfigData('emails.general.notifications.emails.general.notifications.verification')) {
+        } elseif (core()->getConfigData('customer.settings.email.verification')) {
             session()->flash('success', trans('shop::app.customers.signup-form.success-verify'));
         } else {
             session()->flash('success', trans('shop::app.customers.signup-form.success'));

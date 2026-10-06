@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => 'تخصیص محصول',
             'attributes' => 'ویژگی\'ها',
             'b2b' => 'B2B Suite',
             'companies' => 'شرکت\'ها',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => 'پیوست\'های استعلام قیمت',
                         'quote-deleted' => 'استعلام قیمت با موفقیت حذف شد.',
                         'quote-description' => 'توضیحات',
+                        'quote-expired' => 'این استعلام قیمت منقضی شده است.',
                         'quote-information' => 'اطلاعات استعلام قیمت',
                         'quote-item-updated' => 'اقلام استعلام قیمت با موفقیت به‌روزرسانی شد.',
                         'quote-items' => 'اقلام استعلام قیمت',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => 'هیچ محصولی در فهرست درخواست شما وجود ندارد. شروع به افزودن کنید!',
                     'item-updated' => 'اقلام فهرست درخواست با موفقیت به‌روزرسانی شد.',
                     'items-selected' => ':count قلم انتخاب شد',
+                    'limit-reached' => 'به حداکثر تعداد فهرست‌های درخواست رسیده‌اید.',
                     'move-to-cart' => 'انتقال موارد انتخاب‌شده به سبد خرید',
                     'move-to-cart-success' => 'محصول با موفقیت به سبد خرید منتقل شد.',
                     'not-found' => 'فهرست درخواست یافت نشد.',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'نقش با موفقیت ایجاد شد.',
+                    'delete-failed' => 'حذف نقش امکان‌پذیر نبود.',
                     'delete-success' => 'نقش با موفقیت حذف شد.',
                     'update-success' => 'نقش با موفقیت به‌روزرسانی شد.',
 

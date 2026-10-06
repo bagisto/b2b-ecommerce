@@ -22,7 +22,11 @@ class CompanyCreditDataGrid extends DataGrid
     {
         $tablePrefix = DB::getTablePrefix();
 
-        $companyName = 'COALESCE(NULLIF('.$tablePrefix.'b2b_company_flat.business_name, ""), CONCAT('.$tablePrefix.'customers.first_name, " ", '.$tablePrefix.'customers.last_name))';
+        $companyName = "COALESCE(NULLIF({$tablePrefix}b2b_company_flat.business_name, ''), ".db_grammar()->concatWs(
+            ' ',
+            $tablePrefix.'customers.first_name',
+            $tablePrefix.'customers.last_name'
+        ).')';
         $available = $tablePrefix.'b2b_company_credits.credit_limit - '.$tablePrefix.'b2b_company_credits.outstanding_balance';
 
         $queryBuilder = DB::table('b2b_company_credits')

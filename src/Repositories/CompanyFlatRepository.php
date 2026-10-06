@@ -107,8 +107,8 @@ class CompanyFlatRepository extends Repository
             ->when($repId, fn ($builder) => $builder->where('customers.sales_rep_id', $repId))
             ->when((string) $query !== '', function ($builder) use ($query) {
                 $builder->where(function ($sub) use ($query) {
-                    $sub->where('b2b_company_flat.business_name', 'like', '%'.$query.'%')
-                        ->orWhere('b2b_company_flat.email', 'like', '%'.$query.'%');
+                    $sub->where('b2b_company_flat.business_name', db_grammar()->caseInsensitiveLike(), '%'.$query.'%')
+                        ->orWhere('b2b_company_flat.email', db_grammar()->caseInsensitiveLike(), '%'.$query.'%');
                 });
             })
             ->select(

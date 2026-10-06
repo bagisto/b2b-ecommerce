@@ -6,7 +6,7 @@
 --}}
 @php
     $supportedFormats = core()->getConfigData('b2b.quotes.settings.supported_file_formats') ?? 'doc,docx,xls,xlsx,pdf,txt,jpg,png,jpeg';
-    $maxFileSize = (int) (core()->getConfigData('b2b.quotes.settings.maximum_file_size') ?: 2);
+    $maxFileSize = (int) (core()->getConfigData('b2b.quotes.settings.maximum_file_size') ?: 10);
 @endphp
 
 <v-request-quote-modal :cart="cart"></v-request-quote-modal>

@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => 'הקצאת מוצר',
             'attributes' => 'מאפיינים',
             'b2b' => 'B2B Suite',
             'companies' => 'חברות',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => 'קבצים מצורפים להצעת המחיר',
                         'quote-deleted' => 'הצעת המחיר נמחקה בהצלחה.',
                         'quote-description' => 'תיאור',
+                        'quote-expired' => 'תוקף הצעת המחיר הזו פג.',
                         'quote-information' => 'פרטי הצעת המחיר',
                         'quote-item-updated' => 'פריטי הצעת המחיר עודכנו בהצלחה.',
                         'quote-items' => 'פריטי הצעת המחיר',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => 'אין לך מוצרים ברשימת ההזמנה. התחל להוסיף!',
                     'item-updated' => 'פריטי רשימת ההזמנה עודכנו בהצלחה.',
                     'items-selected' => ':count פריטים נבחרו',
+                    'limit-reached' => 'הגעת למספר המרבי של רשימות הזמנה.',
                     'move-to-cart' => 'העברת הנבחרים לעגלה',
                     'move-to-cart-success' => 'המוצר הועבר לעגלה בהצלחה.',
                     'not-found' => 'רשימת ההזמנה לא נמצאה.',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'התפקיד נוצר בהצלחה.',
+                    'delete-failed' => 'לא ניתן היה למחוק את התפקיד.',
                     'delete-success' => 'התפקיד נמחק בהצלחה.',
                     'update-success' => 'התפקיד עודכן בהצלחה.',
 

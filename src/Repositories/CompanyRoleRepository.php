@@ -28,14 +28,15 @@ class CompanyRoleRepository extends Repository
     }
 
     /**
-     * Count customers with all access.
+     * Count the company's customers holding a full-access role, optionally ignoring one role.
      */
-    public function countCustomersWithAllAccess(): int
+    public function countCustomersWithAllAccess(int $companyId, ?int $exceptRoleId = null): int
     {
         return $this->customerRepository->getModel()::query()
-            ->leftJoin('b2b_company_roles', 'customers.company_role_id', '=', 'b2b_company_roles.id')
+            ->join('b2b_company_roles', 'customers.company_role_id', '=', 'b2b_company_roles.id')
+            ->where('b2b_company_roles.customer_id', $companyId)
             ->where('b2b_company_roles.permission_type', 'all')
-            ->get()
+            ->when($exceptRoleId, fn ($query) => $query->where('b2b_company_roles.id', '!=', $exceptRoleId))
             ->count();
     }
 }

@@ -9,15 +9,18 @@ use Webkul\B2BSuite\Http\Controllers\Shop\RequisitionListController;
 use Webkul\B2BSuite\Http\Controllers\Shop\RoleController;
 use Webkul\B2BSuite\Http\Controllers\Shop\UserController;
 use Webkul\Core\Http\Middleware\NoCacheMiddleware;
+use Webkul\Core\Http\Middleware\PreventRequestsDuringMaintenance;
 use Webkul\Shop\Http\Controllers\Customer\CustomerController;
 use Webkul\Shop\Http\Controllers\Customer\RegistrationController;
 
 /**
  * Company registration route (public, pre-authentication).
  */
-Route::post('companies/register', [RegistrationController::class, 'save'])->name('shop.companies.register.store');
+Route::middleware(['shop', PreventRequestsDuringMaintenance::class])
+    ->post('companies/register', [RegistrationController::class, 'save'])
+    ->name('shop.companies.register.store');
 
-Route::group(['middleware' => ['theme', 'locale', 'currency', 'customer', 'customer_bouncer', NoCacheMiddleware::class], 'prefix' => 'customer/account'], function () {
+Route::group(['middleware' => ['theme', 'locale', 'currency', 'customer', 'customer_bouncer', NoCacheMiddleware::class, PreventRequestsDuringMaintenance::class], 'prefix' => 'customer/account'], function () {
     /**
      * Company Profile Routes.
      */

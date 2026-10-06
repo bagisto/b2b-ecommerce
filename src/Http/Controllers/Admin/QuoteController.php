@@ -46,9 +46,11 @@ class QuoteController extends Controller
             return datagrid(CustomerQuoteDataGrid::class)->process();
         }
 
+        $channels = core()->getAllChannels();
+
         $groups = $this->customerGroupRepository->findWhere([['code', '<>', 'guest']]);
 
-        return view('b2b::admin.quotes.index', compact('groups'));
+        return view('b2b::admin.quotes.index', compact('channels', 'groups'));
     }
 
     /**

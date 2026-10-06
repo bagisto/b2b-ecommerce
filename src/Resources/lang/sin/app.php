@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => 'නිෂ්පාදනය පැවරීම',
             'attributes' => 'ගුණාංග',
             'b2b' => 'B2B Suite',
             'companies' => 'සමාගම්',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => 'මිල කැඳවීමේ ඇමුණුම්',
                         'quote-deleted' => 'මිල කැඳවීම සාර්ථකව මකා දමන ලදී.',
                         'quote-description' => 'විස්තරය',
+                        'quote-expired' => 'මෙම මිල කැඳවීම කල් ඉකුත් වී ඇත.',
                         'quote-information' => 'මිල කැඳවීමේ තොරතුරු',
                         'quote-item-updated' => 'මිල කැඳවීමේ අයිතම සාර්ථකව යාවත්කාලීන විය.',
                         'quote-items' => 'මිල කැඳවීමේ අයිතම',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => 'ඔබේ ඉල්ලීම් ලැයිස්තුවේ නිෂ්පාදන නැත. සමහරක් එක් කිරීම ආරම්භ කරන්න!',
                     'item-updated' => 'ඉල්ලීම් ලැයිස්තු අයිතම සාර්ථකව යාවත්කාලීන විය.',
                     'items-selected' => 'අයිතම :count තෝරා ඇත',
+                    'limit-reached' => 'ඔබ ඉල්ලීම් ලැයිස්තුවල උපරිම සංඛ්‍යාවට ළඟා වී ඇත.',
                     'move-to-cart' => 'තෝරාගත් කරත්තයට ගෙන යන්න',
                     'move-to-cart-success' => 'නිෂ්පාදනය කරත්තයට සාර්ථකව ගෙන යන ලදී.',
                     'not-found' => 'ඉල්ලීම් ලැයිස්තුව හමු නොවීය.',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'භූමිකාව සාර්ථකව සාදන ලදී.',
+                    'delete-failed' => 'භූමිකාව මකා දැමිය නොහැකි විය.',
                     'delete-success' => 'භූමිකාව සාර්ථකව මකා දමන ලදී.',
                     'update-success' => 'භූමිකාව සාර්ථකව යාවත්කාලීන විය.',
 

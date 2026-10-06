@@ -3,7 +3,6 @@
 return [
     'admin' => [
         'acl' => [
-            'assign-product' => 'تعيين المنتج',
             'attributes' => 'السمات',
             'b2b' => 'B2B Suite',
             'companies' => 'الشركات',
@@ -958,6 +957,7 @@ return [
                         'quote-attachments' => 'مرفقات عرض السعر',
                         'quote-deleted' => 'تم حذف عرض السعر بنجاح.',
                         'quote-description' => 'الوصف',
+                        'quote-expired' => 'انتهت صلاحية عرض السعر هذا.',
                         'quote-information' => 'معلومات عرض السعر',
                         'quote-item-updated' => 'تم تحديث عناصر عرض السعر بنجاح.',
                         'quote-items' => 'عناصر عرض السعر',
@@ -1015,6 +1015,7 @@ return [
                     'empty-message' => 'لا توجد منتجات في قائمة طلباتك. ابدأ بإضافة بعضها!',
                     'item-updated' => 'تم تحديث عناصر قائمة الطلبات بنجاح.',
                     'items-selected' => ':count عنصر محدد',
+                    'limit-reached' => 'لقد وصلت إلى الحد الأقصى لعدد قوائم الطلبات.',
                     'move-to-cart' => 'نقل المحدد إلى السلة',
                     'move-to-cart-success' => 'تم نقل المنتج إلى السلة بنجاح.',
                     'not-found' => 'لم يتم العثور على قائمة الطلبات.',
@@ -1197,6 +1198,7 @@ return [
                 'roles' => [
                     'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'تم إنشاء الدور بنجاح.',
+                    'delete-failed' => 'تعذر حذف الدور.',
                     'delete-success' => 'تم حذف الدور بنجاح.',
                     'update-success' => 'تم تحديث الدور بنجاح.',
 

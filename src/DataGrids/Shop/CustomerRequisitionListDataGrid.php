@@ -35,7 +35,7 @@ class CustomerRequisitionListDataGrid extends DataGrid
             )
             ->where('b2b_customer_requisition_lists.customer_id', auth()->guard('customer')->user()->id);
 
-        $this->addFilter('requisition_id', 'b2b_customer_requisition_lists.requisition_id');
+        $this->addFilter('requisition_id', 'b2b_customer_requisition_lists.id');
         $this->addFilter('name', 'b2b_customer_requisition_lists.name');
         $this->addFilter('description', 'b2b_customer_requisition_lists.description');
         $this->addFilter('status', 'b2b_customer_requisition_lists.status');
