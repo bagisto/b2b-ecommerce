@@ -46,6 +46,12 @@ class UserDataGrid extends DataGrid
     public function prepareQueryBuilder()
     {
         $tablePrefix = DB::getTablePrefix();
+
+        $fullName = db_grammar()->concatWs(
+            ' ',
+            $tablePrefix.'customers.first_name',
+            $tablePrefix.'customers.last_name'
+        );
         $customer = auth()->guard('customer')->user();
 
         $this->currentUserId = $customer->id;
@@ -76,13 +82,13 @@ class UserDataGrid extends DataGrid
                 'customers.type as customer_type',
                 'b2b_company_roles.name as role'
             )
-            ->addSelect(DB::raw('CONCAT('.$tablePrefix.'customers.first_name, " ", '.$tablePrefix.'customers.last_name) as full_name'))
+            ->addSelect(DB::raw($fullName.' as full_name'))
             ->whereIn('customers.type', ['company', 'user'])
             ->groupBy('customers.id');
 
         $this->addFilter('user_id', 'customers.id');
         $this->addFilter('email', 'customers.email');
-        $this->addFilter('full_name', DB::raw('CONCAT('.$tablePrefix.'customers.first_name, " ", '.$tablePrefix.'customers.last_name)'));
+        $this->addFilter('full_name', DB::raw($fullName));
         $this->addFilter('role', 'b2b_company_roles.name');
         $this->addFilter('phone', 'customers.phone');
         $this->addFilter('status', 'customers.status');
@@ -233,14 +239,18 @@ class UserDataGrid extends DataGrid
         $records = parent::formatRecords($records);
 
         foreach ($records as $record) {
-            // The company owner is read-only here.
+            /**
+             * The company owner is read-only here.
+             */
             if ((int) $record->user_id === (int) $this->companyId) {
                 $record->actions = [];
 
                 continue;
             }
 
-            // A member can't remove themselves from the company (edit is still allowed).
+            /**
+             * A member can't remove themselves from the company (edit is still allowed).
+             */
             if ((int) $record->user_id === (int) $this->currentUserId) {
                 $record->actions = array_values(array_filter(
                     $record->actions,

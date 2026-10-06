@@ -132,7 +132,7 @@
                                     class="cursor-pointer select-none text-base text-zinc-500 max-sm:text-sm ltr:pl-0 rtl:pr-0"
                                     for="show-password"
                                 >
-                                    @lang('shop::app.customers.login-form.show-password')
+                                    @lang('shop::app.components.form.control-group.control.show-password')
                                 </label>
                             </div>
 

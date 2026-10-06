@@ -162,7 +162,10 @@
                                 @if ($isNegotiated)
                                     <!-- Per-item Discount -->
                                     <td class="px-4 py-2">
-                                        @if ($item->discount_type && (float) $item->discount_value > 0)
+                                        @if (
+                                            $item->discount_type
+                                            && (float) $item->discount_value > 0
+                                        )
                                             <span class="font-medium text-green-700">
                                                 {{ $item->discount_type === 'percent'
                                                     ? (float) $item->discount_value . '%'
@@ -206,7 +209,10 @@
                                     <td colspan="6" class="px-4 py-2 ltr:text-right rtl:text-left font-bold">
                                         @lang('b2b::app.shop.customers.account.quotes.view.discount-on-total')
 
-                                        @if ($quote->discount_type && (float) $quote->discount_value > 0)
+                                        @if (
+                                            $quote->discount_type
+                                            && (float) $quote->discount_value > 0
+                                        )
                                             <span class="font-normal text-zinc-500">({{ $quote->discount_type === 'percent'
                                                 ? (float) $quote->discount_value . '%'
                                                 : core()->formatPrice($quote->discount_value, $quote->currency_code) }})</span>
@@ -239,7 +245,7 @@
                             @if ($item->product)
                                 <a
                                     href="{{ $item->product->url_key }}"
-                                    class="inline-block h-[60px] w-[60px] flex-shrink-0"
+                                    class="inline-block h-[60px] w-[60px] shrink-0"
                                 >
                                     <img
                                         src="{{ product_image()->getProductBaseImage($item->product)['small_image_url'] }}"
@@ -249,12 +255,12 @@
                                     />
                                 </a>
                             @else
-                                <div class="flex h-[60px] w-[60px] flex-shrink-0 items-center justify-center rounded border border-gray-300 bg-zinc-100 text-xs font-medium text-zinc-500">
+                                <div class="flex h-[60px] w-[60px] shrink-0 items-center justify-center rounded border border-gray-300 bg-zinc-100 text-xs font-medium text-zinc-500">
                                     @lang('b2b::app.shop.customers.account.quotes.view.product-not-found')
                                 </div>
                             @endif
 
-                            <div class="flex-grow">
+                            <div class="grow">
                                 <p class="text-sm font-semibold text-gray-800">{{ $item->name }}</p>
 
                                 <p class="mt-1 text-xs font-medium text-zinc-500">
@@ -266,7 +272,11 @@
                                     {{ core()->formatPrice($item->price, $quote->currency_code) }}
                                 </p>
 
-                                @if ($isNegotiated && $item->discount_type && (float) $item->discount_value > 0)
+                                @if (
+                                    $isNegotiated
+                                    && $item->discount_type
+                                    && (float) $item->discount_value > 0
+                                )
                                     <p class="mt-1 text-xs font-medium text-green-700">
                                         @lang('b2b::app.shop.customers.account.quotes.view.discount'):
                                         {{ $item->discount_type === 'percent'

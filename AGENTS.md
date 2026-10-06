@@ -13,11 +13,15 @@ quantity-tier/volume pricing).
 
 - **Namespace:** `Webkul\B2BSuite` → `src/`
 - **Installed path:** `vendor/bagisto/b2b-suite` (via `composer require` — see *Installation
-  & registration*). This repo is a **development checkout** at `packages/bagisto/b2b-suite`,
-  symlinked into `vendor/` by the root `packages/*/*` path repository.
-- **PHP:** 8.1+ (per `composer.json`); developed against **Bagisto 2.4 / Laravel 12**. Blade
-  views are styled via the core Shop/Admin themes, which the package rebuilds into its own
-  bundles (see *Styling* below).
+  & registration*). This repo is a **development checkout** cloned to
+  `available-extensions/bagisto/b2b-ecommerce`, symlinked into `vendor/` by the
+  `available-extensions/*/*` path repository (the clone root holds `composer.json`, so the whole
+  clone is the package).
+- **Branch lines:** `3.0` targets **Bagisto 2.5 / Laravel 13 / PHP 8.4 / Tailwind CSS 4**; `2.0`
+  remains the maintenance line for Bagisto 2.4 (Laravel 12, Tailwind 3). The suite's major version
+  does not match Bagisto's — the README carries the compatibility matrix.
+- **PHP:** `^8.4` (per `composer.json`). Blade views are styled via the core Shop/Admin themes,
+  which the package rebuilds into its own bundles (see *Styling* below).
 
 ## Installation & registration
 
@@ -29,11 +33,16 @@ quantity-tier/volume pricing).
    **disabled** — discovery would load the provider too early, before Shop.
 3. `php artisan b2b-suite:install` (migrate, seed, publish assets/overrides, clear caches).
 
-**Development checkout (this repo):** instead of a registry install, the package lives at
-`packages/bagisto/b2b-suite` and is wired via the root `composer.json` path repository
-(`"type": "path", "url": "packages/*/*"` + `"bagisto/b2b-suite": "@dev"`), which symlinks it
-into `vendor/bagisto/b2b-suite`. Provider registration in `bootstrap/providers.php` is the same.
-Do not confuse this dev layout with the install steps above.
+**Development checkout (this repo):** instead of a registry install, the clone lives at
+`available-extensions/bagisto/b2b-ecommerce` and is wired via the app's `available-extensions/*/*`
+path repository, which symlinks it into `vendor/bagisto/b2b-suite`. The package deliberately declares
+no `"version"`, so the app pins one in that repository entry's `options.versions` — Bagisto's root
+sets `minimum-stability: stable`, which rejects the `dev-<branch>` Composer would otherwise infer
+from the clone's branch. The number only has to satisfy the `require` constraint, and pinning also
+keeps the version steady when you switch branches in the clone. Provider registration in
+`bootstrap/providers.php` is the same. Do not confuse this dev layout with the install steps
+above, and never edit the package through `vendor/` — the write reaches the clone but stays
+invisible to its `git status`. The `bagisto-extension-setup` skill covers the app scaffolding.
 
 `B2BSuiteServiceProvider` itself registers `ModuleServiceProvider` (Concord models) and
 `EventServiceProvider`, so there is **no** `config/concord.php` entry.
@@ -109,14 +118,24 @@ How it works (all in the package root unless noted):
 - `paths.cjs` — single source of truth for paths. Walks up to the application root (the
   first directory holding both `artisan` and `public`), so nothing assumes a fixed depth.
   `BAGISTO_ROOT` overrides it. Never hardcode `../../../`.
-- `src/Resources/assets/css/{admin,shop}.css` — the two entry stylesheets.
-- `tailwind.{admin,shop}.config.js` — scan **only** this package's views, reuse the core
-  theme's `theme`/`plugins`/`safelist`/`darkMode` so every token resolves identically, and
-  set `corePlugins.preflight: false` (the core bundle already emits the reset).
-- `vite.{admin,shop}.config.js` — build into `themes/b2b-suite/{admin,shop}/build`. They
-  load `paths.cjs` via `createRequire`, **not** a static `import`: Vite pre-bundles its
-  config with esbuild, which inlines a statically imported CommonJS file and then dies on
-  its `require("fs")`. Don't "tidy" that into an import.
+- `src/Resources/assets/css/{admin,shop}.css` — the two entry stylesheets, and on **Tailwind
+  CSS 4** the whole configuration. There is no `tailwind.*.config.js` any more; Bagisto 2.5
+  removed the core themes' JS configs when it moved to Tailwind 4, so there is nothing left to
+  `require`. Each entry does three things:
+  - declares the layers and imports `tailwindcss/theme.css` and `tailwindcss/utilities.css`
+    **individually, leaving `preflight.css` out** — the core bundle already emits the reset,
+    and emitting it again re-applies base element styles over it;
+  - `@reference`s the core theme's own `app.css`, which contributes its `@theme` tokens,
+    `@utility` definitions and the admin `dark` variant **without emitting a rule**, so a token
+    resolves identically in a B2B view and a core one with no copy of the palette to drift;
+  - lists this package's views with `@source`, so only B2B markup is scanned.
+- `vite.{admin,shop}.config.js` — build into `themes/b2b-suite/{admin,shop}/build` with the
+  `@tailwindcss/vite` plugin (Tailwind 4 has no PostCSS step). Each defines a
+  `@core-{admin,shop}-css` alias resolved through `paths.cjs`, which is how the entry
+  stylesheets `@reference` the core theme without hardcoding a `../` depth. They load
+  `paths.cjs` via `createRequire`, **not** a static `import`: Vite pre-bundles its config with
+  esbuild, which inlines a statically imported CommonJS file and then dies on its
+  `require("fs")`. Don't "tidy" that into an import.
 - `src/Config/bagisto-vite.php` — registers the `b2b-suite-admin` / `b2b-suite-shop` viters
   (merged into `bagisto-vite.viters`) so `@bagistoVite([...], 'b2b-suite-admin')` resolves
   this package's own manifest.
@@ -124,8 +143,8 @@ How it works (all in the package root unless noted):
   injected into the core layout heads by `Providers/EventServiceProvider` on
   `bagisto.{admin,shop}.layout.head.before`.
 
-Two separate builds, not one, because the core Admin and Shop themes have different Tailwind
-presets — their utilities cannot be generated in a single pass.
+Two separate builds, not one, because the core Admin and Shop themes declare different `@theme`
+tokens and variants — their utilities cannot be generated in a single pass.
 
 ### Load order — read before changing it
 
@@ -190,12 +209,15 @@ IDE diagnostics — ignore them.
   ```
 
   (Pre-existing breakage in core's `components/example.blade.php` is unrelated — ignore it.)
-- **Verify Tailwind classes against the built bundle, not from memory.** The B2B theme
-  purges, so a utility — or a responsive variant such as `max-md:flex-col`, or `h-80`,
-  `pl-10`, `text-blue-900` — used in a B2B view but absent from the compiled CSS *silently
-  does nothing*. Check it against `public/themes/<theme>/default/build/assets/app-*.css`
-  (resolve the actual file via `manifest.json`) before relying on it, or express the rule in
-  a scoped `@push('styles')` block / inline `style="…"`.
+- **Verify Tailwind classes against the built bundle, not from memory.** The B2B sheet only
+  emits what its `@source` directives scan, so a utility — or a responsive variant such as
+  `max-md:flex-col`, or `h-80`, `pl-10`, `text-blue-900` — used in a B2B view but absent from
+  the compiled CSS *silently does nothing*. Check it against **this package's own** bundle,
+  `public/themes/b2b-suite/{admin,shop}/build/assets/*.css` (resolve the actual file via its
+  `manifest.json`), not the core theme's. A **responsive variant** needs one extra check: the
+  B2B sheet loads *before* core's, so if core's bundle emits the plain counterpart and not the
+  variant, core's rule wins — confirm the rendered result, not just that the class exists.
+  For one-offs prefer a scoped `@push('styles')` block or an inline `style="…"`.
 - **Comment style in these views.** Use multi-line JSDoc blocks (`/** … */`, one ` * ` per
   line, sentences capitalised and punctuated) for *both* the Vue component JS and the
   `@push('styles')` CSS — keep one consistent comment style across the whole view.

@@ -105,8 +105,31 @@ All B2B settings are grouped together under **Admin Panel → Configure → B2B 
 
 ### 2. Requirements:
 
-* **Bagisto**: v2.4.9 or higher (tested through v2.4.10)
-* **PHP**: 8.3 or higher (below 8.5)
+* **Bagisto**: v2.5.x
+* **PHP**: 8.4 or higher
+
+> **Which suite version do I need?** The suite's major version tracks the Bagisto release it
+> supports, and the two numbers do not match. Install the line that matches your Bagisto:
+>
+> | Bagisto | B2B Suite | Branch |
+> |---|---|---|
+> | v2.5.x | v3.0 and later | `3.0` |
+> | v2.4.9 – v2.4.x | v2.0 – v2.2 | `2.0` |
+>
+> Installing a suite line against the wrong Bagisto is not supported — Bagisto 2.5 moved to
+> Laravel 13, PHP 8.4 and Tailwind CSS 4, and renamed routes and translation keys the suite
+> consumes.
+
+#### Upgrading from v2.x
+
+v3.0 no longer overrides the storefront cart page. `vendor:publish` only writes files, so the
+copy an earlier version published stays behind and keeps overriding Bagisto's own cart — which
+on 2.5 costs you the cart item's remove action. Delete it once, after upgrading:
+
+```bash
+rm -f resources/views/vendor/shop/checkout/cart/index.blade.php
+php artisan optimize:clear
+```
 
 ---
 
@@ -120,7 +143,7 @@ composer require bagisto/b2b-suite
 
 #### Step 2: Register the Service Provider
 
-Add the provider to the array returned by `bootstrap/providers.php` (Bagisto v2.4 runs on Laravel 12, which registers providers here rather than in `config/app.php`):
+Add the provider to the array returned by `bootstrap/providers.php` (Bagisto v2.5 runs on Laravel 13, which registers providers here rather than in `config/app.php`):
 
 > **Note:** Composer package auto-discovery is **not possible** for this provider. Order matters—`B2BSuiteServiceProvider` must be listed **after** the Shop package (or last in the array). Auto-discovery would load it too early, which can cause issues.
 

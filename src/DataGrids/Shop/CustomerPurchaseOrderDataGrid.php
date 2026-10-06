@@ -21,6 +21,12 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
     public function prepareQueryBuilder()
     {
         $tablePrefix = DB::getTablePrefix();
+
+        $customerName = 'COALESCE(NULLIF(TRIM('.db_grammar()->concatWs(
+            ' ',
+            $tablePrefix.'customer.first_name',
+            $tablePrefix.'customer.last_name'
+        )."), ''), ".$tablePrefix.'b2b_customer_quotes.customer_name)';
         $currentAdmin = auth()->guard('customer')->user();
 
         $companyId = DB::table('b2b_customer_companies')
@@ -47,7 +53,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
                 'b2b_customer_quotes.created_at',
                 'b2b_customer_quotes.updated_at'
             )
-            ->addSelect(DB::raw('COALESCE(NULLIF(TRIM(CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)), ""), '.$tablePrefix.'b2b_customer_quotes.customer_name) as customer_name'))
+            ->addSelect(DB::raw($customerName.' as customer_name'))
             ->where('b2b_customer_quotes.soft_deleted', 0)
             ->where('b2b_customer_quotes.state', CustomerQuote::STATE_PURCHASE_ORDER)
             ->whereIn('b2b_customer_quotes.status', [
@@ -62,7 +68,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
         $this->addFilter('status', 'b2b_customer_quotes.status');
         $this->addFilter('base_total', 'b2b_customer_quotes.base_total');
         $this->addFilter('negotiated_total', 'b2b_customer_quotes.negotiated_total');
-        $this->addFilter('customer_name', DB::raw('COALESCE(NULLIF(TRIM(CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)), ""), '.$tablePrefix.'b2b_customer_quotes.customer_name)'));
+        $this->addFilter('customer_name', DB::raw($customerName));
         $this->addFilter('created_at', 'b2b_customer_quotes.created_at');
 
         return $queryBuilder;

@@ -76,7 +76,7 @@
                                 </x-slot>
 
                                 <x-slot:content>
-                                    <x-shop::form.control-group class="!mb-0">
+                                    <x-shop::form.control-group class="mb-0!">
                                         <x-shop::form.control-group.control
                                             type="password"
                                             name="password"
@@ -140,7 +140,7 @@
 
                     <div class="grid w-full grid-cols-[2fr_3fr] border-b border-zinc-100 py-3">
                         <p class="text-sm font-medium">@lang('shop::app.customers.account.profile.index.dob')</p>
-                        <p class="text-sm font-medium text-zinc-500" v-pre>{{ $customer->date_of_birth ?? '—' }}</p>
+                        <p class="text-sm font-medium text-zinc-500" v-pre>{{ $customer->date_of_birth?->format('Y-m-d') ?? '—' }}</p>
                     </div>
 
                     {!! view_render_event('bagisto.shop.customers.account.profile.date_of_birth.after') !!}

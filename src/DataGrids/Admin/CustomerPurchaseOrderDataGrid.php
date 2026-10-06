@@ -24,6 +24,18 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
     {
         $tablePrefix = DB::getTablePrefix();
 
+        $customerName = 'COALESCE(NULLIF(TRIM('.db_grammar()->concatWs(
+            ' ',
+            $tablePrefix.'customer.first_name',
+            $tablePrefix.'customer.last_name'
+        )."), ''), ".$tablePrefix.'b2b_customer_quotes.customer_name)';
+
+        $companyName = "COALESCE(NULLIF({$tablePrefix}b2b_company_flat.business_name, ''), ".db_grammar()->concatWs(
+            ' ',
+            $tablePrefix.'company.first_name',
+            $tablePrefix.'company.last_name'
+        ).')';
+
         $queryBuilder = DB::table('b2b_customer_quotes')
             ->distinct()
             ->leftJoin('customers as company', 'b2b_customer_quotes.company_id', '=', 'company.id')
@@ -47,8 +59,8 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
                 'b2b_customer_quotes.created_at',
                 'b2b_customer_quotes.expiration_date'
             )
-            ->addSelect(DB::raw('COALESCE(NULLIF(TRIM(CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)), ""), '.$tablePrefix.'b2b_customer_quotes.customer_name) as customer_name'))
-            ->addSelect(DB::raw('COALESCE(NULLIF('.$tablePrefix.'b2b_company_flat.business_name, ""), CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name)) as company_name'))
+            ->addSelect(DB::raw($customerName.' as customer_name'))
+            ->addSelect(DB::raw($companyName.' as company_name'))
             ->where('b2b_customer_quotes.state', CustomerQuote::STATE_PURCHASE_ORDER)
             ->whereIn('b2b_customer_quotes.status', [
                 CustomerQuote::STATUS_ORDERED,
@@ -60,15 +72,17 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
         $this->addFilter('status', 'b2b_customer_quotes.status');
         $this->addFilter('base_total', 'b2b_customer_quotes.base_total');
         $this->addFilter('negotiated_total', 'b2b_customer_quotes.negotiated_total');
-        $this->addFilter('customer_name', DB::raw('COALESCE(NULLIF(TRIM(CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)), ""), '.$tablePrefix.'b2b_customer_quotes.customer_name)'));
+        $this->addFilter('customer_name', DB::raw($customerName));
         $this->addFilter('customer_email', 'customer.email');
-        $this->addFilter('company_name', DB::raw('COALESCE(NULLIF('.$tablePrefix.'b2b_company_flat.business_name, ""), CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name))'));
+        $this->addFilter('company_name', DB::raw($companyName));
         $this->addFilter('company_email', 'company.email');
         $this->addFilter('agent_name', 'agent.name');
         $this->addFilter('created_at', 'b2b_customer_quotes.created_at');
         $this->addFilter('expiration_date', 'b2b_customer_quotes.expiration_date');
 
-        // A sales rep only sees purchase orders for the companies they manage; super-admins see all.
+        /**
+         * A sales rep only sees purchase orders for the companies they manage; super-admins see all.
+         */
         if ($repId = Customer::salesRepScopeId()) {
             $queryBuilder->where('company.sales_rep_id', $repId);
         }

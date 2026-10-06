@@ -26,6 +26,12 @@ class CompanyDataGrid extends DataGrid
     {
         $tablePrefix = DB::getTablePrefix();
 
+        $fullName = db_grammar()->concatWs(
+            ' ',
+            $tablePrefix.'b2b_company_flat.first_name',
+            $tablePrefix.'b2b_company_flat.last_name'
+        );
+
         $queryBuilder = DB::table('b2b_company_flat')
             ->distinct()
             ->leftJoin('customers', 'b2b_company_flat.customer_id', '=', 'customers.id')
@@ -42,12 +48,12 @@ class CompanyDataGrid extends DataGrid
                 'b2b_company_flat.created_at',
                 'b2b_company_flat.updated_at'
             )
-            ->addSelect(DB::raw('CONCAT('.$tablePrefix.'b2b_company_flat.first_name, " ", '.$tablePrefix.'b2b_company_flat.last_name) as full_name'))
+            ->addSelect(DB::raw($fullName.' as full_name'))
             ->where('customers.type', 'company')
             ->where('b2b_company_flat.locale', app()->getLocale());
 
         $this->addFilter('customer_id', 'b2b_company_flat.customer_id');
-        $this->addFilter('full_name', DB::raw('CONCAT('.$tablePrefix.'b2b_company_flat.first_name, " ", '.$tablePrefix.'b2b_company_flat.last_name)'));
+        $this->addFilter('full_name', DB::raw($fullName));
         $this->addFilter('email', 'b2b_company_flat.email');
         $this->addFilter('phone', 'b2b_company_flat.phone');
         $this->addFilter('business_name', 'b2b_company_flat.business_name');
@@ -56,7 +62,9 @@ class CompanyDataGrid extends DataGrid
         $this->addFilter('sales_rep_name', 'sales_rep.name');
         $this->addFilter('status', 'customers.status');
 
-        // A sales rep only sees the companies they manage; super-admins see all.
+        /**
+         * A sales rep only sees the companies they manage; super-admins see all.
+         */
         if ($repId = Customer::salesRepScopeId()) {
             $queryBuilder->where('customers.sales_rep_id', $repId);
         }

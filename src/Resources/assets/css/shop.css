@@ -1,13 +1,34 @@
 /**
  * B2B Suite — storefront stylesheet.
  *
- * `@tailwind base` is kept for the `--tw-*` custom property defaults that
- * transform, shadow and ring utilities depend on. The reset itself is not emitted:
- * `corePlugins.preflight` is disabled in `tailwind.shop.config.js`.
+ * Tailwind CSS 4. The layers are declared and imported individually, leaving
+ * `preflight.css` out: the core shop bundle already emits the reset, and emitting
+ * it again would re-apply base element styles over it.
  */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/**
+ * The core shop theme's own entry, loaded for reference only — it contributes its
+ * `@theme` tokens, `@utility` definitions and custom variants to this build
+ * without emitting a single rule of its own. That is what keeps a token such as
+ * `text-navyBlue` resolving to the same value in a B2B view as in a core one,
+ * with no copy of the palette to drift.
+ *
+ * `@core-shop-css` is a Vite alias; `vite.shop.config.js` resolves it through
+ * `paths.cjs`, so this file never hardcodes a `../` depth.
+ */
+@reference "@core-shop-css";
+
+/**
+ * Scanned sources. Only this package's storefront views — the core theme
+ * generates its own utilities in its own bundle.
+ */
+@source "../../views/shop";
+@source "../../views/components";
+@source "../../../../publishables/resources/vendor/shop";
 
 /**
  * The look every B2B datagrid header shares, storefront side.

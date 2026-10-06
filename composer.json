@@ -17,14 +17,13 @@
         }
     ],
     "require": {
-        "php": ">=8.3 <8.5"
+        "php": "^8.4"
     },
     "autoload": {
         "psr-4": {
             "Webkul\\B2BSuite\\": "src/"
         }
     },
-   
     "minimum-stability": "stable",
     "prefer-stable": true
 }

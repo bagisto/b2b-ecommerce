@@ -33,15 +33,14 @@
      */
 @endphp
 
-<div class="panel-side grid min-w-[342px] max-w-[380px] grid-cols-[1fr] gap-8 overflow-x-hidden max-xl:min-w-[270px] max-md:max-w-full max-md:gap-5">
+<div class="panel-side journal-scroll grid max-h-330 min-w-85.5 max-w-95 grid-cols-[1fr] gap-8 overflow-y-auto overflow-x-hidden max-xl:min-w-67.5 max-md:max-w-full max-md:gap-5">
     <!-- Account Profile Hero Section -->
-    <div class="grid grid-cols-[auto_1fr] items-center gap-4 rounded-xl border border-zinc-200 px-5 py-[25px] max-md:py-2.5">
+    <div class="grid grid-cols-[auto_1fr] items-center gap-4 rounded-xl border border-zinc-200 px-5 py-6.25 max-md:py-2.5">
         <div class="">
             <img
                 src="{{ $customer->image_url ??  bagisto_asset('images/user-placeholder.png') }}"
-                class="h-[60px] w-[60px] shrink-0 rounded-full object-cover"
-                style="min-width: 60px;"
-                alt="Profile Image"
+                class="h-15 w-15 rounded-full"
+                alt="{{ trans('shop::app.components.layouts.account.profile-image') }}"
             >
         </div>
 
@@ -78,7 +77,7 @@
 
             <!-- Account Navigation Content -->
             @if ($coreChildren->isNotEmpty())
-                <div class="grid rounded-md border border-b border-l-[1px] border-r border-t-0 border-zinc-200 max-md:border-none">
+                <div class="grid rounded-md border border-b border-l border-r border-t-0 border-zinc-200 max-md:border-none">
                     @foreach ($coreChildren as $subMenuItem)
                         <a href="{{ $subMenuItem->getUrl() }}">
                             <div class="flex justify-between px-6 py-5 border-t border-zinc-200 hover:bg-zinc-100 cursor-pointer max-md:p-4 max-md:border-0 max-md:py-3 max-md:px-0 {{ $subMenuItem->isActive() ? 'bg-zinc-100' : '' }}">
@@ -107,7 +106,7 @@
                 </div>
 
                 <!-- Company Navigation Content -->
-                <div class="grid rounded-md border border-b border-l-[1px] border-r border-t-0 border-zinc-200 max-md:border-none">
+                <div class="grid rounded-md border border-b border-l border-r border-t-0 border-zinc-200 max-md:border-none">
                     @foreach ($b2bChildren as $subMenuItem)
                         <a href="{{ $subMenuItem->getUrl() }}">
                             <div class="flex justify-between px-6 py-5 border-t border-zinc-200 hover:bg-zinc-100 cursor-pointer max-md:p-4 max-md:border-0 max-md:py-3 max-md:px-0 {{ $subMenuItem->isActive() ? 'bg-zinc-100' : '' }}">

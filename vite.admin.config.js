@@ -2,8 +2,7 @@ import { defineConfig, loadEnv } from "vite";
 import laravel from "laravel-vite-plugin";
 import path from "path";
 import { createRequire } from "module";
-import tailwindcss from "tailwindcss";
-import autoprefixer from "autoprefixer";
+import tailwindcss from "@tailwindcss/vite";
 
 /**
  * B2B Suite — admin build.
@@ -37,16 +36,23 @@ export default defineConfig(({ mode }) => {
             cors: true,
         },
 
-        css: {
-            postcss: {
-                plugins: [
-                    tailwindcss(path.join(paths.packageDir, "tailwind.admin.config.js")),
-                    autoprefixer(),
-                ],
+        /**
+         * `@core-admin-css` lets `admin.css` reference the core theme's entry without
+         * hardcoding a `../` depth — the package is built from several depths, which
+         * is why `paths.cjs` resolves the application root by walking up.
+         */
+        resolve: {
+            alias: {
+                "@core-admin-css": path.join(
+                    paths.adminDir,
+                    "src/Resources/assets/css/app.css"
+                ),
             },
         },
 
         plugins: [
+            tailwindcss(),
+
             laravel({
                 /**
                  * Written verbatim, so an absolute path is safe. The filename must

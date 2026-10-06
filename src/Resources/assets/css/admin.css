@@ -1,13 +1,33 @@
 /**
  * B2B Suite — admin stylesheet.
  *
- * `@tailwind base` is kept for the `--tw-*` custom property defaults that
- * transform, shadow and ring utilities depend on. The reset itself is not emitted:
- * `corePlugins.preflight` is disabled in `tailwind.admin.config.js`.
+ * Tailwind CSS 4. The layers are declared and imported individually, leaving
+ * `preflight.css` out: the core admin bundle already emits the reset, and emitting
+ * it again would re-apply base element styles over it.
  */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/**
+ * The core admin theme's own entry, loaded for reference only — it contributes its
+ * `@theme` tokens, `@utility` definitions and the `dark` custom variant to this
+ * build without emitting a single rule of its own, so a token resolves identically
+ * in a B2B view and a core one.
+ *
+ * `@core-admin-css` is a Vite alias; `vite.admin.config.js` resolves it through
+ * `paths.cjs`, so this file never hardcodes a `../` depth.
+ */
+@reference "@core-admin-css";
+
+/**
+ * Scanned sources. Only this package's admin views — the core theme generates its
+ * own utilities in its own bundle.
+ */
+@source "../../views/admin";
+@source "../../views/components";
+@source "../../../../publishables/resources/vendor/admin";
 
 /**
  * The look every B2B datagrid header shares, admin side.
