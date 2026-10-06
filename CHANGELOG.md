@@ -2,6 +2,40 @@
 
 This changelog consists of the bug & security updates.
 
+## **v2.2.2 (6th of October 2026)** - *Release*
+
+- Admins with a custom role, such as sales representatives, can use every B2B action their permissions cover; 34 admin routes were missing from the ACL and answered 401. Changing a company's credit limit or recording a reimbursement now has its own Edit permission.
+
+- A buyer can no longer accept their own counter-offer. "Accept & Add to Cart" is only possible while the seller's offer is the latest one, and a counter-offer can only change the quote it was sent on.
+
+- Customers can no longer open, change or download from another company's quotes, roles, users or requisition lists by changing the id in the address.
+
+- Accepted quotes no longer charge a negotiated price converted twice when the store displays a currency other than the base currency.
+
+- The minimum quote amount and the allowed attachment formats and size are now enforced when the quote request is saved, not only in the browser, and a storefront quote request can only be created as a draft or open quote.
+
+- Quote expiry now honours the configured unit (days, weeks or months), and an expired quote can no longer be accepted.
+
+- Refunding a Pay By Credit order now gives the refunded amount back to the company's credit, and cancelling a partly invoiced order releases only the part that was not invoiced.
+
+- Members of a disabled company lose access to the company features, including Pay By Credit.
+
+- Company users can only be given a role of their own company, and a member can no longer change their own role or suspend themselves. A role a member edits now stays with the company.
+
+- Re-running `b2b-suite:install` no longer deletes the company attributes, and with them every company's attribute values.
+
+- The "verify your email" message after a company registers now shows when email verification is enabled.
+
+- The account profile page no longer fails for company accounts while the suite is switched off, and the suite's storefront pages now honour maintenance mode.
+
+- Adding a product to the cart validates its option quantities again and reports an out-of-stock product instead of sending the shopper to its product page.
+
+- The requisition list limit is now enforced and counted per customer, a customer's first list becomes their default, and filtering the list grid by ID works.
+
+- `b2b-suite:seed-demo` now explains that it needs Composer's development dependencies instead of failing on a missing class.
+
+- Added three messages across all **22 locales**.
+
 ## **v2.2.1 (6th of October 2026)** - *Release*
 
 - #55 [fixed] - Opening a requisition list no longer risks a server error. The suite routed `GET customer/account/requisitions/create` to a controller action that does not exist; creating a list has always been done through the modal on the requisitions page, which posts to its own route, so the dead route has been removed along with the duplicate page heading that linked to it.
