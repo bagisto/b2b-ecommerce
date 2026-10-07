@@ -1,0 +1,100 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches:
+      - '3.0'
+      - master
+  pull_request:
+    branches:
+      - '3.0'
+      - master
+  workflow_dispatch:
+    inputs:
+      bagisto_version:
+        description: 'Bagisto image version to test against (e.g. 2.5.0 or latest). Defaults to 2.5.0.'
+        required: false
+        type: string
+  schedule:
+    - cron: '0 3 * * 1'
+
+permissions:
+  contents: read
+
+env:
+  FORCE_COLOR: 1
+
+jobs:
+  playwright_tests:
+    runs-on: ${{ matrix.operating-systems }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-systems: [ubuntu-latest]
+        node-version: ["22.13.1"]
+        db: [mysql, mariadb, postgres]
+        include:
+          - db: mysql
+            db-label: MySQL
+
+          - db: mariadb
+            db-label: MariaDB
+
+          - db: postgres
+            db-label: PostgreSQL
+
+    name: B2B Suite · ${{ matrix.db-label }}
+
+    env:
+      BAGISTO_VERSION: ${{ github.event_name == 'schedule' && 'latest' || inputs.bagisto_version || '2.5.0' }}
+      BAGISTO_CONTAINER: bagisto
+      BAGISTO_PORT: 8080
+      APP_URL: http://127.0.0.1:8080
+      APP_TIMEZONE: Asia/Kolkata
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Bagisto
+        env:
+          BAGISTO_IMAGE: webkul/bagisto:${{ env.BAGISTO_VERSION }}-nginx-${{ matrix.db }}
+        run: bash .github/scripts/boot-bagisto.sh
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install Node.js Dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: |
+          sudo apt-get update --allow-releaseinfo-change
+          npm run install:browsers
+
+      - name: Type Check Playwright Tests
+        run: npm run typecheck
+
+      - name: Run All Playwright Tests
+        run: npm run test:e2e
+
+      - name: Collect Server Logs
+        if: always()
+        run: |
+          mkdir -p server-logs
+          docker logs "${BAGISTO_CONTAINER}" > server-logs/container.log 2>&1 || true
+          docker cp "${BAGISTO_CONTAINER}:/var/www/bagisto/storage/logs/." server-logs/ 2>/dev/null || true
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: b2b-suite-results-${{ matrix.db }}-${{ github.run_id }}-${{ github.run_number }}
+          path: |
+            tests/e2e-pw/playwright-report
+            tests/e2e-pw/test-results
+            server-logs
+          retention-days: 1
