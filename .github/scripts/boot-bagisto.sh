@@ -3,12 +3,15 @@
 # Boots a published Bagisto image with this package installed, for the Playwright suite.
 #
 # Required: BAGISTO_IMAGE   e.g. webkul/bagisto:2.5.0-nginx-mysql
-# Optional: BAGISTO_CONTAINER (bagisto), BAGISTO_PORT (8080), PACKAGE_DIR (the repository root),
-#           PACKAGE_VERSION (3.0.0)
+# Optional: BAGISTO_CONTAINER (bagisto), BAGISTO_PORT (8080), MAILPIT_PORT (8025),
+#           PACKAGE_DIR (the repository root), PACKAGE_VERSION (3.0.0)
 #
 # The image already runs on Asia/Kolkata; APP_TIMEZONE is not passed because the image's
 # entrypoint cannot write a value containing a slash. The PHP runtime is restarted after the
 # install because the image's opcache never revalidates the files the install changes.
+#
+# Mailpit shares the container's network, so the mail the image sends to 127.0.0.1:2525 lands
+# in Mailpit without changing any Bagisto setting; its API is published on MAILPIT_PORT.
 
 set -euo pipefail
 
@@ -16,6 +19,7 @@ set -euo pipefail
 
 CONTAINER="${BAGISTO_CONTAINER:-bagisto}"
 PORT="${BAGISTO_PORT:-8080}"
+MAILPIT_PORT="${MAILPIT_PORT:-8025}"
 APP_URL="http://127.0.0.1:${PORT}"
 PACKAGE_DIR="${PACKAGE_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 PACKAGE_VERSION="${PACKAGE_VERSION:-3.0.0}"
@@ -26,12 +30,24 @@ echo "::group::Start Bagisto Image (${BAGISTO_IMAGE})"
 docker run -d \
     --name "${CONTAINER}" \
     -p "${PORT}:80" \
+    -p "${MAILPIT_PORT}:8025" \
     -e APP_URL="${APP_URL}" \
     "${BAGISTO_IMAGE}"
+
+docker run -d \
+    --name "${CONTAINER}-mailpit" \
+    --network "container:${CONTAINER}" \
+    -e MP_SMTP_BIND_ADDR=0.0.0.0:2525 \
+    -e MP_UI_BIND_ADDR=0.0.0.0:8025 \
+    axllent/mailpit
 
 curl --silent --fail --output /dev/null \
     --retry 60 --retry-delay 2 --retry-all-errors \
     "${APP_URL}/"
+
+curl --silent --fail --output /dev/null \
+    --retry 30 --retry-delay 2 --retry-all-errors \
+    "http://127.0.0.1:${MAILPIT_PORT}/api/v1/info"
 echo "::endgroup::"
 
 echo "::group::Copy Package Into Container"

@@ -11,6 +11,7 @@ use Webkul\Admin\Http\Resources\ProductResource;
 use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
 use Webkul\Customer\Repositories\CustomerGroupRepository;
 use Webkul\Customer\Repositories\CustomerRepository;
+use Webkul\Product\Enums\SearchContextEnum;
 use Webkul\Product\Repositories\ProductRepository;
 use Webkul\Shop\Http\Controllers\Controller;
 
@@ -121,45 +122,26 @@ class QuickOrderController extends Controller
             ]);
         }
 
-        $searchEngine = 'database';
-
-        if (
-            core()->getConfigData('catalog.products.search.engine') == 'elastic'
-            && core()->getConfigData('catalog.products.search.admin_mode') == 'elastic'
-        ) {
-            $searchEngine = 'elastic';
-
-            $indexNames = core()->getAllChannels()->map(function ($channel) {
-                return 'products_'.$channel->code.'_'.app()->getLocale().'_index';
-            })->toArray();
-        }
-
         $channelId = $this->customerRepository->find(auth()->guard('customer')->user()->id)->channel_id ?? null;
 
-        $params = [
-            'index' => $indexNames ?? null,
-            'name' => request('query'),
-            'sort' => 'created_at',
-            'order' => 'desc',
-            'channel_id' => $channelId,
-        ];
-
         $products = $this->productRepository
-            ->setSearchEngine($searchEngine)
-            ->getAll($params);
-
-        if ($products->isEmpty()) {
-            $params = [
-                'index' => $indexNames ?? null,
-                'sku' => request('query'),
+            ->setSearchContext(SearchContextEnum::STOREFRONT)
+            ->getAll([
+                'name' => request('query'),
                 'sort' => 'created_at',
                 'order' => 'desc',
                 'channel_id' => $channelId,
-            ];
+            ]);
 
+        if ($products->isEmpty()) {
             $products = $this->productRepository
-                ->setSearchEngine($searchEngine)
-                ->getAll($params);
+                ->setSearchContext(SearchContextEnum::STOREFRONT)
+                ->getAll([
+                    'sku' => request('query'),
+                    'sort' => 'created_at',
+                    'order' => 'desc',
+                    'channel_id' => $channelId,
+                ]);
         }
 
         return ProductResource::collection($products);

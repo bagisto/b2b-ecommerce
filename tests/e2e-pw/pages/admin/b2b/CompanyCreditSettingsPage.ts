@@ -10,6 +10,10 @@ export class CompanyCreditSettingsPage extends AdminPage {
         return this.page.locator('form:has(input[name="credit_limit"])');
     }
 
+    private get reimburseForm(): Locator {
+        return this.page.locator('form:has(input[name="amount"])');
+    }
+
     private summaryValue(label: string): Locator {
         return this.page
             .locator("span", { hasText: new RegExp(`^\\s*${label}\\s*$`, "i") })
@@ -33,5 +37,16 @@ export class CompanyCreditSettingsPage extends AdminPage {
 
         await expect(this.flash("Credit settings updated successfully.")).toBeVisible();
         await expect(this.summaryValue("Credit Limit")).toContainText(limit.toLocaleString("en-US"));
+    }
+
+    async recordReimbursement(companyId: string, amount: number): Promise<void> {
+        await this.visit(`admin/b2b/company-credits/${companyId}`);
+        await this.waitForVueMount();
+
+        await this.page.getByRole("button", { name: "Reimburse Balance" }).click();
+        await this.reimburseForm.locator('input[name="amount"]').fill(String(amount));
+        await this.reimburseForm.getByRole("button", { name: "Record Payment" }).click();
+
+        await expect(this.flash("Payment recorded against the company balance.")).toBeVisible();
     }
 }

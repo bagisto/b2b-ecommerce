@@ -35,8 +35,8 @@ export class CheckoutPage extends ShopPage {
             .locator(':scope > p:not(:text-is("Grand Total"))');
     }
 
-    private get orderIdHeading(): Locator {
-        return this.page.locator("p.text-xl").filter({ hasText: /#\s*\d+/ });
+    private get orderLink(): Locator {
+        return this.page.locator('p.text-xl a[href*="/orders/view/"]');
     }
 
     private optionLabel(id: string): Locator {
@@ -153,7 +153,7 @@ export class CheckoutPage extends ShopPage {
 
         await expect(this.page).toHaveURL(/checkout\/onepage\/success/, { timeout: 30 * 1000 });
 
-        return (await this.orderIdHeading.innerText()).match(/#\s*(\d+)/)![1];
+        return (await this.orderLink.getAttribute("href"))!.match(/orders\/view\/(\d+)/)![1];
     }
 
     async attemptPlaceOrder(): Promise<number> {

@@ -1,12 +1,15 @@
 import { test } from "../../setup";
 import { CompaniesPage } from "../../pages/admin/b2b/CompaniesPage";
+import { QuoteListPage } from "../../pages/admin/b2b/QuoteListPage";
 import { ConfigurationPage, type SwitchValues } from "../../pages/admin/ConfigurationPage";
 import { RestrictedAdminPage } from "../../pages/admin/RestrictedAdminPage";
 import { RolesPage } from "../../pages/admin/settings/RolesPage";
 import { UsersPage, type AdminUser } from "../../pages/admin/settings/UsersPage";
+import { CartPage } from "../../pages/shop/CartPage";
 import { CompanyRegistrationPage } from "../../pages/shop/CompanyRegistrationPage";
-import { buildCompany } from "../../utils/company";
+import { buildCompany, signInAsApprovedCompany } from "../../utils/company";
 import { generateEmail, uniqueStamp } from "../../utils/faker";
+import { createQuotableProduct } from "../../utils/product";
 import { B2B_GENERAL_SECTION, COMPANY_APPROVAL_SETTING } from "../../utils/settings";
 
 test.describe("b2b admin permissions", () => {
@@ -67,5 +70,53 @@ test.describe("b2b admin permissions", () => {
         }
 
         await companies.expectCompanyStatus(company.email, "Active");
+    });
+
+    test("should only show a sales representative the quotations of their own companies", async ({ adminPage, shopPage, browser }) => {
+        test.setTimeout(240 * 1000);
+
+        const product = await createQuotableProduct(adminPage, 100);
+        const ownQuote = `Rep Quote ${uniqueStamp()}`;
+        const otherQuote = `Other Quote ${uniqueStamp()}`;
+
+        const ownCompany = await signInAsApprovedCompany(shopPage, adminPage);
+        const ownCart = new CartPage(shopPage);
+
+        await ownCart.addProduct(product.urlKey!, 1);
+        await ownCart.requestQuote({ name: ownQuote, description: "Quote for the assigned company.", attachments: [] });
+
+        const otherContext = await browser.newContext();
+        let otherQuoteId: string;
+
+        try {
+            const otherPage = await otherContext.newPage();
+            const otherCart = new CartPage(otherPage);
+
+            await signInAsApprovedCompany(otherPage, adminPage);
+            await otherCart.addProduct(product.urlKey!, 1);
+
+            otherQuoteId = await otherCart.requestQuote({ name: otherQuote, description: "Quote for another company.", attachments: [] });
+        } finally {
+            await otherContext.close();
+        }
+
+        await new RolesPage(adminPage).createRole(salesRepresentative.role, ["b2b.quotes"]);
+        await new UsersPage(adminPage).createUser(salesRepresentative);
+        await new CompaniesPage(adminPage).assignSalesRepresentative(ownCompany.email, salesRepresentative.name);
+
+        const repContext = await browser.newContext();
+
+        try {
+            const repPage = await repContext.newPage();
+            const quotes = new QuoteListPage(repPage);
+
+            await new RestrictedAdminPage(repPage).login(salesRepresentative.email, salesRepresentative.password);
+
+            await quotes.expectQuoteListed(ownQuote);
+            await quotes.expectQuoteNotListed(otherQuote);
+            await new RestrictedAdminPage(repPage).expectRouteForbidden(`admin/b2b/quotes/${otherQuoteId!}`);
+        } finally {
+            await repContext.close();
+        }
     });
 });

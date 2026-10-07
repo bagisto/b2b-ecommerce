@@ -52,6 +52,8 @@ jobs:
       BAGISTO_PORT: 8080
       APP_URL: http://127.0.0.1:8080
       APP_TIMEZONE: Asia/Kolkata
+      MAILPIT_PORT: 8025
+      MAILPIT_URL: http://127.0.0.1:8025
 
     steps:
       - name: Checkout

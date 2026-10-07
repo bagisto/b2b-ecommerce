@@ -7,6 +7,7 @@ export interface E2eEnv {
     adminPassword: string;
     timezone: string;
     headed: boolean;
+    mailpitUrl: string;
 }
 
 const envPath = resolveEnvPath();
@@ -55,4 +56,6 @@ export const env: E2eEnv = {
     timezone: optional("APP_TIMEZONE", "UTC"),
 
     headed: optionalBoolean("HEADED", false),
+
+    mailpitUrl: optional("MAILPIT_URL", "http://127.0.0.1:8025").replace(/\/+$/, ""),
 };

@@ -37,4 +37,10 @@ export class RestrictedAdminPage extends AdminPage {
 
         expect(response?.status()).toBe(401);
     }
+
+    async expectRouteForbidden(path: string): Promise<void> {
+        const response = await this.page.goto(path);
+
+        expect(response?.status()).toBe(403);
+    }
 }

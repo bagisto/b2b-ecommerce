@@ -212,8 +212,7 @@ class CompanyCatalogController extends Controller
          * bundle products are reached the same way (through their parent), not here.
          */
         $products = app(ProductRepository::class)
-            ->setSearchEngine('database')
-            ->getAll(array_filter([
+            ->searchFromDatabase(array_filter([
                 'query' => $query !== '' ? $query : null,
                 'type' => request('type') ?: null,
                 'status' => 1,
