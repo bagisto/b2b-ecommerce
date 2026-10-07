@@ -1088,6 +1088,7 @@ return [
                     'no-matching-products' => 'Tidak ada produk yang dipilih cocok dengan filter Anda.',
                     'no-products-found' => 'Tidak ada produk yang ditemukan.',
                     'page' => 'Halaman',
+                    'remove' => 'Hapus',
                     'remove-selected' => 'Hapus yang Dipilih',
                     'search-by-sku-name' => 'Cari Produk berdasarkan SKU atau Nama',
                     'select-all' => 'Pilih Semua',

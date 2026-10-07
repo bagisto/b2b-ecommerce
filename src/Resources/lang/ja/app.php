@@ -1088,6 +1088,7 @@ return [
                     'no-matching-products' => 'フィルターに一致する選択商品がありません。',
                     'no-products-found' => '商品が見つかりません。',
                     'page' => 'ページ',
+                    'remove' => '削除',
                     'remove-selected' => '選択項目を削除',
                     'search-by-sku-name' => 'SKU または名前で商品を検索',
                     'select-all' => 'すべて選択',

@@ -6,13 +6,15 @@ export class CompanyRolesPage extends ShopPage {
         return this.page.getByRole("button", { name: "Save Role", exact: true });
     }
 
-    private permissionOption(key: string): Locator {
-        return this.page.locator("label", {
-            has: this.page.locator(`input[type="checkbox"][value="${key}"]`),
-        });
+    private permissionInput(key: string): Locator {
+        return this.page.locator(`input[type="checkbox"][value="${key}"]`);
     }
 
-    async createCustomRole(name: string, permissionKeys: string[]): Promise<void> {
+    private permissionOption(key: string): Locator {
+        return this.page.locator("label", { has: this.permissionInput(key) });
+    }
+
+    async createCustomRole(name: string, grantedKeys: string[], revokedKeys: string[] = []): Promise<void> {
         await this.visit("customer/account/roles/create");
         await this.waitForVueMount();
 
@@ -20,8 +22,14 @@ export class CompanyRolesPage extends ShopPage {
         await this.page.locator('textarea[name="description"]').fill(`${name} role`);
         await this.page.locator('select[name="permission_type"]').selectOption("custom");
 
-        for (const key of permissionKeys) {
+        for (const key of grantedKeys) {
             await this.permissionOption(key).click();
+            await expect(this.permissionInput(key)).toBeChecked();
+        }
+
+        for (const key of revokedKeys) {
+            await this.permissionOption(key).click();
+            await expect(this.permissionInput(key)).not.toBeChecked();
         }
 
         await this.saveButton.click();

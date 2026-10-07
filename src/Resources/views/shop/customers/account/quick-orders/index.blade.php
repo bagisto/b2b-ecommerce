@@ -409,7 +409,7 @@
                                 type="button"
                                 class="grid h-9 w-9 place-items-center rounded-lg text-lg text-gray-400 transition-all hover:bg-red-50 hover:text-red-600"
                                 @click="removeProduct(product.id)"
-                                aria-label="@lang('b2b::app.shop.customers.account.quick-orders.btn-add')"
+                                aria-label="@lang('b2b::app.shop.customers.account.quick-orders.remove')"
                             >
                                 <span class="icon-cancel"></span>
                             </button>

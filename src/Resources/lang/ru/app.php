@@ -1088,6 +1088,7 @@ return [
                     'no-matching-products' => 'Нет выбранных товаров, соответствующих вашему фильтру.',
                     'no-products-found' => 'Товары не найдены.',
                     'page' => 'Страница',
+                    'remove' => 'Удалить',
                     'remove-selected' => 'Удалить выбранные',
                     'search-by-sku-name' => 'Поиск товара по SKU или названию',
                     'select-all' => 'Выбрать всё',

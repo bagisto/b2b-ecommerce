@@ -1088,6 +1088,7 @@ return [
                     'no-matching-products' => 'Filtrenizle eşleşen seçili ürün yok.',
                     'no-products-found' => 'Ürün bulunamadı.',
                     'page' => 'Sayfa',
+                    'remove' => 'Kaldır',
                     'remove-selected' => 'Seçilenleri Kaldır',
                     'search-by-sku-name' => 'Ürünü SKU veya Ada Göre Ara',
                     'select-all' => 'Tümünü Seç',

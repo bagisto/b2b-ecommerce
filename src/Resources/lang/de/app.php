@@ -1088,6 +1088,7 @@ return [
                     'no-matching-products' => 'Keine ausgewählten Produkte entsprechen Ihrem Filter.',
                     'no-products-found' => 'Keine Produkte gefunden.',
                     'page' => 'Seite',
+                    'remove' => 'Entfernen',
                     'remove-selected' => 'Ausgewählte entfernen',
                     'search-by-sku-name' => 'Produkt nach SKU oder Name suchen',
                     'select-all' => 'Alle auswählen',

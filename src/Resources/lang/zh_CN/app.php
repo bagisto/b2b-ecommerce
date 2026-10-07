@@ -1088,6 +1088,7 @@ return [
                     'no-matching-products' => '没有符合您筛选条件的所选产品。',
                     'no-products-found' => '未找到产品。',
                     'page' => '页',
+                    'remove' => '移除',
                     'remove-selected' => '移除所选',
                     'search-by-sku-name' => '按 SKU 或名称搜索产品',
                     'select-all' => '全选',

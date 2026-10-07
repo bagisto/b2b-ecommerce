@@ -30,7 +30,7 @@ class RequisitionListController extends Controller
     ) {}
 
     /**
-     * Populate the request for quote page.
+     * Display the requisition lists of the current customer.
      *
      * @return View
      */
@@ -45,34 +45,6 @@ class RequisitionListController extends Controller
         $totalRequisitionList = $this->customerRequisitionRepository->findByField('customer_id', $customerId);
 
         return view('b2b::shop.customers.account.requisitions.index')->with('totalRequisition', $totalRequisitionList->count());
-    }
-
-    /**
-     * For editing the existing addresses of current logged in customer.
-     */
-    public function list(): JsonResponse
-    {
-        $requisitions = $this->customerRequisitionRepository->findWhere([
-            'status' => CustomerRequisitionList::STATUS_ACTIVE,
-            'customer_id' => auth()->guard('customer')->user()->id,
-        ])
-            ->sortByDesc('created_at')
-            ->take(5)
-            ->map(function ($requisition) {
-                return [
-                    'id' => $requisition->id,
-                    'name' => $requisition->name,
-                ];
-            });
-
-        $totalRequisition = $this->customerRequisitionRepository->count([
-            'customer_id' => auth()->guard('customer')->user()->id,
-        ]);
-
-        return new JsonResponse([
-            'requisitions' => $requisitions,
-            'allow_new_list' => (int) core()->getConfigData('b2b.general.settings.no_requisition_list') > $totalRequisition,
-        ]);
     }
 
     /**
@@ -241,7 +213,7 @@ class RequisitionListController extends Controller
             }
 
             /**
-             * Reload updated items
+             * Reload the updated items.
              */
             $updatedItems = $requisition->items()->get();
 
@@ -257,7 +229,7 @@ class RequisitionListController extends Controller
     }
 
     /**
-     * Delete address of the current customer.
+     * Delete one of the current customer's requisition lists.
      */
     public function destroy(int $id): JsonResponse
     {
@@ -279,6 +251,34 @@ class RequisitionListController extends Controller
         return new JsonResponse([
             'message' => trans('b2b::app.shop.customers.account.requisitions.delete-success'),
             'redirect_url' => route('shop.customers.account.requisitions.index'),
+        ]);
+    }
+
+    /**
+     * List the current customer's active requisition lists for the add-to-list dropdown.
+     */
+    public function list(): JsonResponse
+    {
+        $requisitions = $this->customerRequisitionRepository->findWhere([
+            'status' => CustomerRequisitionList::STATUS_ACTIVE,
+            'customer_id' => auth()->guard('customer')->user()->id,
+        ])
+            ->sortByDesc('created_at')
+            ->take(5)
+            ->map(function ($requisition) {
+                return [
+                    'id' => $requisition->id,
+                    'name' => $requisition->name,
+                ];
+            });
+
+        $totalRequisition = $this->customerRequisitionRepository->count([
+            'customer_id' => auth()->guard('customer')->user()->id,
+        ]);
+
+        return new JsonResponse([
+            'requisitions' => $requisitions,
+            'allow_new_list' => (int) core()->getConfigData('b2b.general.settings.no_requisition_list') > $totalRequisition,
         ]);
     }
 
@@ -308,7 +308,7 @@ class RequisitionListController extends Controller
         }
 
         /**
-         * Reload updated items
+         * Reload the updated items.
          */
         $updatedItems = $requisition->items()->get();
 
@@ -387,7 +387,8 @@ class RequisitionListController extends Controller
     }
 
     /**
-     * Method for move to cart selected items from requisition list.
+     * Move the selected requisition items to the cart, leaving behind any product outside
+     * the customer's company catalog.
      */
     public function moveToCart(): JsonResponse
     {
@@ -407,9 +408,11 @@ class RequisitionListController extends Controller
             abort(404);
         }
 
-        $requisitionItems = $requisition->items->whereIn('id', $data['ids']);
+        [$visibleItems, $hiddenItems] = $requisition->items
+            ->whereIn('id', $data['ids'])
+            ->partition(fn ($item) => $this->productRepository->isVisible($item->product));
 
-        foreach ($requisitionItems as $item) {
+        foreach ($visibleItems as $item) {
             $additional = $item->additional ? json_decode($item->additional, true) : [];
 
             $additional['quantity'] = $item->qty ?? 1;
@@ -422,7 +425,13 @@ class RequisitionListController extends Controller
             }
         }
 
-        session()->flash('success', trans('b2b::app.shop.customers.account.requisitions.move-to-cart-success'));
+        if ($visibleItems->isNotEmpty()) {
+            session()->flash('success', trans('b2b::app.shop.customers.account.requisitions.move-to-cart-success'));
+        }
+
+        if ($hiddenItems->isNotEmpty()) {
+            session()->flash('warning', trans('b2b::app.shop.checkout.cart.product-not-in-catalog'));
+        }
 
         return new JsonResponse([
             'redirect_url' => route('shop.checkout.cart.index'),

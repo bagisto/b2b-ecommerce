@@ -1088,6 +1088,7 @@ return [
                     'no-matching-products' => 'Cap producte seleccionat coincideix amb el vostre filtre.',
                     'no-products-found' => 'No s\'ha trobat cap producte.',
                     'page' => 'Pàgina',
+                    'remove' => 'Eliminar',
                     'remove-selected' => 'Eliminar seleccionats',
                     'search-by-sku-name' => 'Cercar producte per SKU o nom',
                     'select-all' => 'Seleccionar-ho tot',

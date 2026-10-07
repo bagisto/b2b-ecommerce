@@ -1088,6 +1088,7 @@ return [
                     'no-matching-products' => 'තෝරාගත් නිෂ්පාදන කිසිවක් ඔබේ පෙරහනට ගැළපෙන්නේ නැත.',
                     'no-products-found' => 'නිෂ්පාදන හමු නොවීය.',
                     'page' => 'පිටුව',
+                    'remove' => 'ඉවත් කරන්න',
                     'remove-selected' => 'තෝරාගත් ඉවත් කරන්න',
                     'search-by-sku-name' => 'SKU හෝ නම අනුව නිෂ්පාදනය සොයන්න',
                     'select-all' => 'සියල්ල තෝරන්න',

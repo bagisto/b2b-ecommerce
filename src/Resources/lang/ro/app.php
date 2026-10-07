@@ -1088,6 +1088,7 @@ return [
                     'no-matching-products' => 'Niciun produs selectat nu corespunde filtrului dvs.',
                     'no-products-found' => 'Niciun produs găsit.',
                     'page' => 'Pagină',
+                    'remove' => 'Elimină',
                     'remove-selected' => 'Elimină selectate',
                     'search-by-sku-name' => 'Caută produs după SKU sau nume',
                     'select-all' => 'Selectează tot',

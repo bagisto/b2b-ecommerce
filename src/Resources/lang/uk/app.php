@@ -1088,6 +1088,7 @@ return [
                     'no-matching-products' => 'Жоден вибраний товар не відповідає вашому фільтру.',
                     'no-products-found' => 'Товарів не знайдено.',
                     'page' => 'Сторінка',
+                    'remove' => 'Вилучити',
                     'remove-selected' => 'Вилучити вибране',
                     'search-by-sku-name' => 'Пошук товару за SKU або назвою',
                     'select-all' => 'Вибрати все',

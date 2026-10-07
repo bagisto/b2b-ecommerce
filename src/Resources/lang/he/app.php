@@ -1088,6 +1088,7 @@ return [
                     'no-matching-products' => 'אף מוצר שנבחר אינו תואם את המסנן שלך.',
                     'no-products-found' => 'לא נמצאו מוצרים.',
                     'page' => 'עמוד',
+                    'remove' => 'הסרה',
                     'remove-selected' => 'הסרת הנבחרים',
                     'search-by-sku-name' => 'חיפוש מוצר לפי SKU או שם',
                     'select-all' => 'בחירת הכל',

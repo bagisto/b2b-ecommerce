@@ -2,6 +2,18 @@
 
 This changelog consists of the bug & security updates.
 
+## **v3.0.1 (7th of October 2026)** - *Release*
+
+- Fixed the Assign Products picker on the admin company catalog page failing with an error instead of listing the matching products.
+
+- Fixed the quick order search by product name or SKU failing with an error. The multiple-SKU box and the CSV upload were not affected.
+
+- Fixed a company buying products outside its catalog by moving a requisition list into the cart. Those products now stay behind with a notice, and can no longer be added to a list.
+
+- Fixed screen readers announcing the remove button next to each selected product on the quick order page as "Add".
+
+- Added an end-to-end Playwright suite covering registration, quotations, purchase orders, Pay By Credit, company users and roles, company catalogs, requisition lists, quick order and the company profile. CI runs it on MySQL, MariaDB and PostgreSQL.
+
 ## **v3.0.0 (6th of October 2026)** - *Release*
 
 - The suite now targets **Bagisto v2.5** on Laravel 13 and PHP 8.4. The v2.0 line remains the one to install on Bagisto v2.4.

@@ -100,11 +100,16 @@ class CustomerRequisitionRepository extends Repository
     }
 
     /**
-     * Prepare requisition items from product details.
+     * Prepare requisition items from product details, refusing a product outside the
+     * customer's company catalog.
      */
     public function prepareRequisitionItemsByProduct(array $data): array
     {
         $product = $this->productRepository->with(['variants'])->findOrFail($data['product_id']);
+
+        if (! $this->productRepository->isVisible($product)) {
+            throw new \Exception(trans('b2b::app.shop.checkout.cart.product-not-in-catalog'));
+        }
 
         $items = [];
         switch ($product->type) {

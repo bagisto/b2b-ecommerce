@@ -1088,6 +1088,7 @@ return [
                     'no-matching-products' => 'कोई चयनित उत्पाद आपके फ़िल्टर से मेल नहीं खाता।',
                     'no-products-found' => 'कोई उत्पाद नहीं मिला।',
                     'page' => 'पृष्ठ',
+                    'remove' => 'हटाएँ',
                     'remove-selected' => 'चयनित हटाएँ',
                     'search-by-sku-name' => 'SKU या नाम से उत्पाद खोजें',
                     'select-all' => 'सभी चुनें',

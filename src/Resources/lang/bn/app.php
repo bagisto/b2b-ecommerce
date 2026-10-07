@@ -1088,6 +1088,7 @@ return [
                     'no-matching-products' => 'আপনার ফিল্টারের সাথে কোনো নির্বাচিত পণ্য মেলে না।',
                     'no-products-found' => 'কোনো পণ্য পাওয়া যায়নি।',
                     'page' => 'পৃষ্ঠা',
+                    'remove' => 'সরান',
                     'remove-selected' => 'নির্বাচিত সরান',
                     'search-by-sku-name' => 'SKU বা নাম দিয়ে পণ্য অনুসন্ধান করুন',
                     'select-all' => 'সব নির্বাচন করুন',

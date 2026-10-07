@@ -1088,6 +1088,7 @@ return [
                     'no-matching-products' => 'هیچ محصول انتخاب‌شده‌ای با فیلتر شما مطابقت ندارد.',
                     'no-products-found' => 'هیچ محصولی یافت نشد.',
                     'page' => 'صفحه',
+                    'remove' => 'حذف',
                     'remove-selected' => 'حذف موارد انتخاب‌شده',
                     'search-by-sku-name' => 'جستجوی محصول بر اساس SKU یا نام',
                     'select-all' => 'انتخاب همه',

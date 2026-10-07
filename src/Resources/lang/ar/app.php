@@ -1088,6 +1088,7 @@ return [
                     'no-matching-products' => 'لا توجد منتجات محددة تطابق التصفية.',
                     'no-products-found' => 'لم يتم العثور على منتجات.',
                     'page' => 'الصفحة',
+                    'remove' => 'إزالة',
                     'remove-selected' => 'إزالة المحدد',
                     'search-by-sku-name' => 'البحث عن منتج بالـ SKU أو الاسم',
                     'select-all' => 'تحديد الكل',
