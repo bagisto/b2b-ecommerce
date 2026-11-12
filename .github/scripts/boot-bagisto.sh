@@ -12,6 +12,8 @@
 #
 # Mailpit shares the container's network, so the mail the image sends to 127.0.0.1:2525 lands
 # in Mailpit without changing any Bagisto setting; its API is published on MAILPIT_PORT.
+#
+# QUEUE_CONNECTION=sync runs mail and price reindexing before the tests check them.
 
 set -euo pipefail
 
@@ -32,6 +34,7 @@ docker run -d \
     -p "${PORT}:80" \
     -p "${MAILPIT_PORT}:8025" \
     -e APP_URL="${APP_URL}" \
+    -e QUEUE_CONNECTION=sync \
     "${BAGISTO_IMAGE}"
 
 docker run -d \
