@@ -63,6 +63,7 @@ export class CompanyCatalogPage extends AdminPage {
     async createCatalog(name: string): Promise<void> {
         await this.visit("admin/b2b/company-catalogs");
         await this.waitForVueMount();
+        await this.waitForBackgroundRequestsToSettle();
         await this.createButton.click();
 
         const panel = this.modalPanel("Create Company Catalog");
