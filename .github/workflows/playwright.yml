@@ -31,7 +31,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        operating-systems: [ubuntu-latest]
+        operating-systems: [ubuntu-24.04]
         node-version: ["22.13.1"]
         bagisto: ${{ fromJSON(github.event_name == 'schedule' && '["latest"]' || inputs.bagisto_version && format('["{0}"]', inputs.bagisto_version) || '["2.5.0", "2.5.1"]') }}
         db: [mysql, mariadb, postgres]
