@@ -4,7 +4,7 @@
 #
 # Required: BAGISTO_IMAGE   e.g. webkul/bagisto:2.5.0-nginx-mysql
 # Optional: BAGISTO_CONTAINER (bagisto), BAGISTO_PORT (8080), MAILPIT_PORT (8025),
-#           PACKAGE_DIR (the repository root), PACKAGE_VERSION (3.0.0)
+#           PACKAGE_DIR (the repository root), PACKAGE_VERSION (3.0.2)
 #
 # The image already runs on Asia/Kolkata; APP_TIMEZONE is not passed because the image's
 # entrypoint cannot write a value containing a slash. The PHP runtime is restarted after the
@@ -22,7 +22,7 @@ PORT="${BAGISTO_PORT:-8080}"
 MAILPIT_PORT="${MAILPIT_PORT:-8025}"
 APP_URL="http://127.0.0.1:${PORT}"
 PACKAGE_DIR="${PACKAGE_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
-PACKAGE_VERSION="${PACKAGE_VERSION:-3.0.0}"
+PACKAGE_VERSION="${PACKAGE_VERSION:-3.0.2}"
 APP_DIR=/var/www/bagisto
 PACKAGE_MOUNT=/opt/b2b-suite
 

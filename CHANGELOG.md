@@ -2,6 +2,14 @@
 
 This changelog consists of the bug & security updates.
 
+## **v3.0.2 (12th of November 2026)** - *Release*
+
+- The suite now supports Bagisto v2.5.0 and v2.5.1, and CI tests it against both on MySQL, MariaDB and PostgreSQL.
+
+- Fixed Buy Now on Bagisto v2.5.1 setting the shopper's cart aside. It now runs on a cart of its own, as Bagisto does.
+
+- Fixed long customer names and emails overflowing on the account pages, and the account greeting always reading in English.
+
 ## **v3.0.1 (7th of October 2026)** - *Release*
 
 - Fixed the Assign Products picker on the admin company catalog page failing with an error instead of listing the matching products.
