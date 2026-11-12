@@ -2,6 +2,7 @@
 
 namespace Webkul\B2BSuite\Http\Controllers\Shop\API;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
 use Webkul\B2BSuite\Helpers\CompanyCatalog;
@@ -9,10 +10,8 @@ use Webkul\B2BSuite\Repositories\CustomerQuoteItemRepository;
 use Webkul\CartRule\Repositories\CartRuleCouponRepository;
 use Webkul\Checkout\Facades\Cart;
 use Webkul\Customer\Repositories\CustomerRepository;
-use Webkul\Product\Exceptions\InsufficientProductInventoryException;
 use Webkul\Product\Repositories\ProductRepository;
 use Webkul\Shop\Http\Controllers\API\CartController as BaseCartController;
-use Webkul\Shop\Http\Resources\CartResource;
 
 class CartController extends BaseCartController
 {
@@ -27,7 +26,7 @@ class CartController extends BaseCartController
     }
 
     /**
-     * Store items in cart - Override to prevent adding negotiated products when already in cart.
+     * Refuse what B2B forbids, then add the product as core does, so each Bagisto release keeps its own buy now flow.
      *
      * No return type is declared (matching the core controller) because the success path
      * returns a JsonResource while the error path returns a JsonResponse (HTTP 400).
@@ -36,77 +35,15 @@ class CartController extends BaseCartController
     {
         $this->validate(request(), [
             'product_id' => 'required|integer|exists:products,id',
-            'is_buy_now' => 'integer|in:0,1',
-            'quantity' => 'integer|min:1',
-            'qty' => 'array',
-            'qty.*' => 'integer|min:0',
-            'bundle_option_qty' => 'array',
-            'bundle_option_qty.*' => 'integer|min:1',
         ]);
 
         $product = $this->productRepository->with('parent')->findOrFail(request()->input('product_id'));
 
-        try {
-            if (! $product->status) {
-                throw new \Exception(trans('shop::app.checkout.cart.inactive-add'));
-            }
-
-            if (! $this->isWithinCompanyCatalog($product)) {
-                throw new \Exception(trans('b2b::app.shop.checkout.cart.product-not-in-catalog'));
-            }
-
-            $cart = Cart::getCart();
-
-            if ($cart) {
-                /**
-                 * Look up an existing line for this product with a direct query (items())
-                 * rather than the cached `items` relation. Touching $cart->items here would
-                 * cache the collection on the very cart instance that Cart::addProduct()
-                 * later re-reads in collectTotals()/validateItems(); when the cart is empty
-                 * that stale cache makes addProduct wrongly drop the whole cart and return
-                 * null — which is what made the first add-to-cart fail.
-                 */
-                $existingCartItem = $cart->items()->where('product_id', $product->id)->first();
-
-                if ($existingCartItem) {
-                    $existingAdditional = $existingCartItem->additional ?? [];
-
-                    if (isset($existingAdditional['quote_id'])) {
-                        return response()->json([
-                            'message' => trans('b2b::app.shop.checkout.cart.cannot-add-product-with-negotiated-price'),
-                        ], Response::HTTP_BAD_REQUEST);
-                    }
-                }
-            }
-
-            $response = [];
-
-            if (request()->input('is_buy_now')) {
-                Cart::deActivateCart();
-
-                $response['redirect'] = route('shop.checkout.onepage.index');
-            }
-
-            $cart = Cart::addProduct($product, request()->all());
-
-            return new JsonResource(array_merge([
-                'data' => new CartResource($cart),
-                'message' => trans('shop::app.checkout.cart.item-add-to-cart'),
-            ], $response));
-        } catch (InsufficientProductInventoryException $exception) {
-            return response()->json([
-                'message' => $exception->getMessage(),
-            ], Response::HTTP_BAD_REQUEST);
-        } catch (\Exception $exception) {
-            return response()->json([
-                'redirect_uri' => route('shop.product_or_category.index', $product->url_key),
-                'message' => $exception->getMessage(),
-            ], Response::HTTP_BAD_REQUEST);
-        }
+        return $this->refusal($product) ?? parent::store();
     }
 
     /**
-     * Updates the quantity of the items present in the cart.
+     * Refuse a change to a quantity a quote negotiated, then update the cart as core does.
      */
     public function update(): JsonResource
     {
@@ -115,46 +52,94 @@ class CartController extends BaseCartController
             'qty.*' => 'required|integer|min:0',
         ]);
 
-        try {
-            $data = request()->input();
-
-            $cart = Cart::getCart();
-
-            foreach ($data['qty'] as $cartItemId => $quantity) {
-                $cartItem = $cart->items->where('id', $cartItemId)->first();
-
-                if (! $cartItem) {
-                    continue;
-                }
-
-                $additional = $cartItem->additional;
-
-                if (isset($additional['quote_id']) && isset($additional['quote_item_id'])) {
-                    $negotiation = $this->customerQuoteItemRepository
-                        ->where('id', $additional['quote_item_id'])
-                        ->where('customer_quote_id', $additional['quote_id'])
-                        ->first();
-
-                    if ($negotiation && $quantity != $negotiation->negotiated_qty) {
-                        return new JsonResource([
-                            'message' => trans('b2b::app.shop.checkout.cart.cannot-change-negotiated-quantity'),
-                        ]);
-                    }
-                }
-            }
-
-            Cart::updateItems($data);
-
+        if ($this->changesNegotiatedQuantity(request()->input('qty'))) {
             return new JsonResource([
-                'data' => new CartResource(Cart::getCart()),
-                'message' => trans('shop::app.checkout.cart.index.quantity-update'),
-            ]);
-
-        } catch (\Exception $exception) {
-            return new JsonResource([
-                'message' => $exception->getMessage(),
+                'message' => trans('b2b::app.shop.checkout.cart.cannot-change-negotiated-quantity'),
             ]);
         }
+
+        return parent::update();
+    }
+
+    /**
+     * Why an active product may not be added, or null when nothing stands in the way.
+     *
+     * An inactive product is left to core, which refuses it with its own message.
+     */
+    protected function refusal($product): ?JsonResponse
+    {
+        if (! $product->status) {
+            return null;
+        }
+
+        if (! $this->isWithinCompanyCatalog($product)) {
+            return response()->json([
+                'redirect_uri' => route('shop.product_or_category.index', $product->url_key),
+                'message' => trans('b2b::app.shop.checkout.cart.product-not-in-catalog'),
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if ($this->hasNegotiatedLine($product)) {
+            return response()->json([
+                'message' => trans('b2b::app.shop.checkout.cart.cannot-add-product-with-negotiated-price'),
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        return null;
+    }
+
+    /**
+     * Whether the cart already holds the product at a price a quote negotiated.
+     *
+     * The line is found with a query rather than the cached `items` relation: caching it here
+     * would leave a stale collection on the cart instance that Cart::addProduct() reads again,
+     * which on an empty cart makes it drop the whole cart and return null.
+     */
+    protected function hasNegotiatedLine($product): bool
+    {
+        $cart = Cart::getCart();
+
+        if (! $cart) {
+            return false;
+        }
+
+        $line = $cart->items()->where('product_id', $product->id)->first();
+
+        return isset($line?->additional['quote_id']);
+    }
+
+    /**
+     * Whether the requested quantities change a line whose quantity a quote negotiated.
+     */
+    protected function changesNegotiatedQuantity(array $quantities): bool
+    {
+        $cart = Cart::getCart();
+
+        if (! $cart) {
+            return false;
+        }
+
+        foreach ($quantities as $cartItemId => $quantity) {
+            $additional = $cart->items->firstWhere('id', $cartItemId)?->additional ?? [];
+
+            if (! isset($additional['quote_id'], $additional['quote_item_id'])) {
+                continue;
+            }
+
+            $negotiation = $this->customerQuoteItemRepository->findOneWhere([
+                'id' => $additional['quote_item_id'],
+                'customer_quote_id' => $additional['quote_id'],
+            ]);
+
+            if (
+                $negotiation
+                && $quantity != $negotiation->negotiated_qty
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
