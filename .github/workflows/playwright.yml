@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
     inputs:
       bagisto_version:
-        description: 'Bagisto image version to test against (e.g. 2.5.0 or latest). Defaults to 2.5.0.'
+        description: 'Bagisto image version to test against (e.g. 2.5.1 or latest). Defaults to every supported release, 2.5.0 and 2.5.1.'
         required: false
         type: string
   schedule:
@@ -33,21 +33,22 @@ jobs:
       matrix:
         operating-systems: [ubuntu-latest]
         node-version: ["22.13.1"]
+        bagisto: ${{ fromJSON(github.event_name == 'schedule' && '["latest"]' || inputs.bagisto_version && format('["{0}"]', inputs.bagisto_version) || '["2.5.0", "2.5.1"]') }}
         db: [mysql, mariadb, postgres]
         include:
           - db: mysql
-            db-label: MySQL
+            db-label: MySQL 8.0
 
           - db: mariadb
-            db-label: MariaDB
+            db-label: MariaDB 10.11
 
           - db: postgres
-            db-label: PostgreSQL
+            db-label: PostgreSQL 16
 
-    name: B2B Suite · ${{ matrix.db-label }}
+    name: B2B Suite · Bagisto ${{ matrix.bagisto }} · ${{ matrix.db-label }}
 
     env:
-      BAGISTO_VERSION: ${{ github.event_name == 'schedule' && 'latest' || inputs.bagisto_version || '2.5.0' }}
+      BAGISTO_VERSION: ${{ matrix.bagisto }}
       BAGISTO_CONTAINER: bagisto
       BAGISTO_PORT: 8080
       APP_URL: http://127.0.0.1:8080
@@ -94,7 +95,7 @@ jobs:
         uses: actions/upload-artifact@v6
         if: always()
         with:
-          name: b2b-suite-results-${{ matrix.db }}-${{ github.run_id }}-${{ github.run_number }}
+          name: b2b-suite-results-${{ matrix.bagisto }}-${{ matrix.db }}-${{ github.run_id }}-${{ github.run_number }}
           path: |
             tests/e2e-pw/playwright-report
             tests/e2e-pw/test-results
