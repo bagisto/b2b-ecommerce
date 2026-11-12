@@ -115,7 +115,7 @@
 
                     <div class="grid w-full grid-cols-[2fr_3fr] border-b border-zinc-100 py-3">
                         <p class="text-sm font-medium">@lang('shop::app.customers.account.profile.index.first-name')</p>
-                        <p class="text-sm font-medium text-zinc-500" v-pre>{{ $customer->first_name }}</p>
+                        <p class="text-sm font-medium text-zinc-500 wrap-anywhere" v-pre>{{ $customer->first_name }}</p>
                     </div>
 
                     {!! view_render_event('bagisto.shop.customers.account.profile.first_name.after') !!}
@@ -124,7 +124,7 @@
 
                     <div class="grid w-full grid-cols-[2fr_3fr] border-b border-zinc-100 py-3">
                         <p class="text-sm font-medium">@lang('shop::app.customers.account.profile.index.last-name')</p>
-                        <p class="text-sm font-medium text-zinc-500" v-pre>{{ $customer->last_name }}</p>
+                        <p class="text-sm font-medium text-zinc-500 wrap-anywhere" v-pre>{{ $customer->last_name }}</p>
                     </div>
 
                     {!! view_render_event('bagisto.shop.customers.account.profile.last_name.after') !!}
@@ -133,7 +133,7 @@
 
                     <div class="grid w-full grid-cols-[2fr_3fr] border-b border-zinc-100 py-3">
                         <p class="text-sm font-medium">@lang('shop::app.customers.account.profile.index.gender')</p>
-                        <p class="text-sm font-medium text-zinc-500" v-pre>{{ $customer->gender ?? '—' }}</p>
+                        <p class="text-sm font-medium text-zinc-500 wrap-anywhere" v-pre>{{ $customer->gender ?? '—' }}</p>
                     </div>
 
                     {!! view_render_event('bagisto.shop.customers.account.profile.gender.after') !!}
@@ -142,7 +142,7 @@
 
                     <div class="grid w-full grid-cols-[2fr_3fr] border-b border-zinc-100 py-3">
                         <p class="text-sm font-medium">@lang('shop::app.customers.account.profile.index.dob')</p>
-                        <p class="text-sm font-medium text-zinc-500" v-pre>{{ $customer->date_of_birth?->format('Y-m-d') ?? '—' }}</p>
+                        <p class="text-sm font-medium text-zinc-500 wrap-anywhere" v-pre>{{ $customer->date_of_birth?->format('Y-m-d') ?? '—' }}</p>
                     </div>
 
                     {!! view_render_event('bagisto.shop.customers.account.profile.date_of_birth.after') !!}
@@ -151,7 +151,7 @@
 
                     <div class="grid w-full grid-cols-[2fr_3fr] py-3">
                         <p class="text-sm font-medium">@lang('shop::app.customers.account.profile.index.email')</p>
-                        <p class="text-sm font-medium text-zinc-500" v-pre>{{ $customer->email }}</p>
+                        <p class="text-sm font-medium text-zinc-500 wrap-anywhere" v-pre>{{ $customer->email }}</p>
                     </div>
 
                     {!! view_render_event('bagisto.shop.customers.account.profile.email.after') !!}
