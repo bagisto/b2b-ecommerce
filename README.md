@@ -5,8 +5,18 @@
 
 
 <p align="center">
-    <img alt="Packagist Downloads" src="https://img.shields.io/packagist/dt/bagisto/b2b-suite"> 
-    <a href="https://packagist.org/packages/bagisto/b2b-suite"><img src="https://poser.pugx.org/bagisto/b2b-suite/license.svg" alt="License"></a>
+    <a href="https://packagist.org/packages/bagisto/b2b-suite"><img src="https://img.shields.io/packagist/dt/bagisto/b2b-suite" alt="Total Downloads"></a>
+    <a href="https://packagist.org/packages/bagisto/b2b-suite"><img src="https://img.shields.io/packagist/v/bagisto/b2b-suite?label=stable" alt="Latest Stable Version"></a>
+    <a href="https://packagist.org/packages/bagisto/b2b-suite"><img src="https://img.shields.io/packagist/l/bagisto/b2b-suite" alt="License"></a>
+</p>
+
+<p align="center">
+    <a href="https://github.com/bagisto/b2b-ecommerce/actions/workflows/playwright.yml"><img src="https://img.shields.io/github/actions/workflow/status/bagisto/b2b-ecommerce/playwright.yml?label=playwright" alt="Playwright Tests"></a>
+</p>
+
+<p align="center">
+    <a href="https://x.com/bagistoshop"><img src="https://img.shields.io/badge/Follow-%40bagistoshop-000000?style=social&logo=x" alt="Follow Bagisto on X"></a>
+    <a href="https://www.youtube.com/@Bagisto"><img src="https://img.shields.io/badge/YouTube-Subscribe-FF0000?style=social&logo=youtube" alt="Subscribe to Bagisto on YouTube"></a>
 </p>
 
 ---
