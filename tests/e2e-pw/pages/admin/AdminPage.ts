@@ -3,7 +3,7 @@ import { BasePage } from "../BasePage";
 
 export abstract class AdminPage extends BasePage {
     protected get flashContainer(): Locator {
-        return this.page.locator("div.fixed.top-5.z-\\[10003\\]");
+        return this.page.locator("div.fixed.top-5.grid.justify-items-end");
     }
 
     protected get errorCode(): Locator {
